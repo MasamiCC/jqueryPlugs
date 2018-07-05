@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>悬浮框</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			.a {
+				width: 100px;
+				height: 100px;
+				background-color: red;
+				position: absolute;
+			}
+			
+			/*关闭按钮具体位置可以调整*/
+			.suspend_area .close{
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 20px;
+				height: 20px;
+				background-color: black;
+				cursor: pointer;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			//悬浮框
+			(function($) {
+				$.fn.suspend = function(options) {
+					options = $.extend({
+						//定义一个对象，设置默认值
+
+						//是否自动漂浮（默认为true）
+						autoFloat: true,
+
+						//运动速度（默认为10）
+						speed: 10,
+
+					}, options);
+
+					//设置是否自动浮动，速度
+					var autoFloat = options.autoFloat;
+					var speed = options.speed;
+					
+					//初始值
+					var x = 0;
+					var y = 0;
+					var xin = true;
+					var yin = true;
+					var step = 1;
+					var obj=$(this);
+					var closeObj=$(this).find('.close');
+					
+					//定义漂浮方法
+					var suspend=function(){
+						var L=0;
+						var T=0;
+						var R = document.documentElement.clientWidth - obj.outerWidth();
+						var B = document.documentElement.clientHeight - obj.outerHeight();
+						obj.css({
+							"left": x + document.documentElement.scrollLeft + 'px',
+							"top": y + document.documentElement.scrollTop + 'px'
+						});
+						x = x + step*(xin?1:-1);
+						if (x < L) { xin = true; x = L}
+						if (x > R) { xin = false; x = R}
+						 y = y + step*(yin?1:-1)
+						if (y < T) { yin = true; y = T }
+						if (y > B) { yin = false; y = B }
+					}
+					
+					
+					/*判断是否自动漂浮*/
+					if(autoFloat){
+						var time= setInterval(suspend,speed);
+						/*鼠标移入移出事件*/
+						obj.hover(function(){
+							clearInterval(time);
+						},function(){
+							time= setInterval(suspend,speed);
+						})
+					}
+					
+					/*关闭按钮点击事件*/
+					closeObj.click(function(){
+						obj.hide();
+					})
+
+					return this;
+				}
+			})(window.jQuery),
+
+			$(function() {
+				$('.a').suspend({
+					autoFloat: true, //是否自动漂浮
+					speed: 10 //漂浮速度
+				})
+
+			})
+		</script>
+	</head>
+
+	<body>
+		<!--
+        	作者：offline
+        	时间：2017-12-11
+        	描述：悬浮框
+        -->
+		<div class="a suspend_area">
+			<div class="close">
+				
+			</div>
+		</div>
+	</body>
+
+</html>

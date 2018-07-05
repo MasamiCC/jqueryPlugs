@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			/*
+			 * 页面加载中
+			 */
+			.loading{
+				position: fixed;
+				top: 0;
+				padding: 0;
+				width: 100%;
+				height: 100%;
+				display: flex;
+				display: -webkit-flex; /* Safari */
+				align-items:center;
+				justify-content:center;
+				background-color: rgba(0,0,0,0.3);
+				z-index: 999;
+			}
+			
+			.spinner {
+				width: 50px;
+				height: 50px;
+				position: relative;
+			}
+			
+			.container1>div,
+			.container2>div,
+			.container3>div {
+				width: 10px;
+				height: 10px;
+				background-color: #333;
+				border-radius: 100%;
+				position: absolute;
+				-webkit-animation: bouncedelay 1.2s infinite ease-in-out;
+				animation: bouncedelay 1.2s infinite ease-in-out;
+				-webkit-animation-fill-mode: both;
+				animation-fill-mode: both;
+			}
+			
+			.spinner .spinner-container {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+			}
+			
+			.container2 {
+				-webkit-transform: rotateZ(45deg);
+				transform: rotateZ(45deg);
+			}
+			
+			.container3 {
+				-webkit-transform: rotateZ(90deg);
+				transform: rotateZ(90deg);
+			}
+			
+			.circle1 {
+				top: 0;
+				left: 0;
+			}
+			
+			.circle2 {
+				top: 0;
+				right: 0;
+			}
+			
+			.circle3 {
+				right: 0;
+				bottom: 0;
+			}
+			
+			.circle4 {
+				left: 0;
+				bottom: 0;
+			}
+			
+			.container2 .circle1 {
+				-webkit-animation-delay: -1.1s;
+				animation-delay: -1.1s;
+			}
+			
+			.container3 .circle1 {
+				-webkit-animation-delay: -1.0s;
+				animation-delay: -1.0s;
+			}
+			
+			.container1 .circle2 {
+				-webkit-animation-delay: -0.9s;
+				animation-delay: -0.9s;
+			}
+			
+			.container2 .circle2 {
+				-webkit-animation-delay: -0.8s;
+				animation-delay: -0.8s;
+			}
+			
+			.container3 .circle2 {
+				-webkit-animation-delay: -0.7s;
+				animation-delay: -0.7s;
+			}
+			
+			.container1 .circle3 {
+				-webkit-animation-delay: -0.6s;
+				animation-delay: -0.6s;
+			}
+			
+			.container2 .circle3 {
+				-webkit-animation-delay: -0.5s;
+				animation-delay: -0.5s;
+			}
+			
+			.container3 .circle3 {
+				-webkit-animation-delay: -0.4s;
+				animation-delay: -0.4s;
+			}
+			
+			.container1 .circle4 {
+				-webkit-animation-delay: -0.3s;
+				animation-delay: -0.3s;
+			}
+			
+			.container2 .circle4 {
+				-webkit-animation-delay: -0.2s;
+				animation-delay: -0.2s;
+			}
+			
+			.container3 .circle4 {
+				-webkit-animation-delay: -0.1s;
+				animation-delay: -0.1s;
+			}
+			
+			@-webkit-keyframes bouncedelay {
+				0%,
+				80%,
+				100% {
+					-webkit-transform: scale(0.0)
+				}
+				40% {
+					-webkit-transform: scale(1.0)
+				}
+			}
+			
+			@keyframes bouncedelay {
+				0%,
+				80%,
+				100% {
+					transform: scale(0.0);
+					-webkit-transform: scale(0.0);
+				}
+				40% {
+					transform: scale(1.0);
+					-webkit-transform: scale(1.0);
+				}
+			}
+			
+			/*
+			 * tab表切换
+			 */
+			.a .active {
+				color: red;
+			}
+			/*
+			 * 进度条样式
+			 */
+			
+			.c {
+				width: 1000px;
+				height: 50px;
+				align-items: Center;
+				display: flex;
+			}
+			/*显示百分比*/
+			/*你可以自己配置进度条的各种样式哟*/
+			
+			.c .progress_bar {
+				position: relative;
+			}
+			
+			.c .percent {
+				background-color: #ffffff;
+				color: #000000;
+				padding: 0 10px;
+				position: absolute;
+				top: 0;
+				right: 10px;
+				display: block;
+			}
+			/*
+			 * 轮播样式
+			 */
+			
+			.d {
+				position: relative;
+				width: 550px;
+				height: 340px;
+				overflow: hidden;
+			}
+			/*这些你可以自己改动，如果你会的话*/
+			/*公共下圆角*/
+			
+			.position_ul {
+				height: 35px;
+				line-height: 35px;
+				padding-right: 15px;
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				margin: 0;
+				width: 100%;
+				background-color: rgba(0, 0, 0, 0.4);
+				text-align: right;
+			}
+			
+			.position_ul li {
+				display: inline-block;
+				margin-top: 15px;
+				cursor: pointer;
+				width: 10px;
+				height: 10px;
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+				border-radius: 5px;
+				background: #333;
+				margin-right: 5px;
+				background-color: #FFFFFF;
+			}
+			
+			.position_ul li.cur {
+				background: #C70128;
+			}
+			/*公共左右箭头*/
+			
+			.prev,
+			.next {
+				position: absolute;
+				top: 40%;
+				display: block;
+				width: 20px;
+				height: 30px;
+				z-index: 2;
+				cursor: pointer;
+				background-color: red;
+			}
+			
+			.prev {
+				left: 0;
+			}
+			
+			.next {
+				right: 0;
+			}
+			/*依靠透明度变化*/
+			
+			.fade_ul>li {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+			}
+			
+			/*图片高度自适应*/
+			.fade_ul>li img {
+				width: 100%;
+				height: 100%;
+			}
+			/*左右移动切换*/
+			
+			.scrollX_ul {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+			}
+			
+			.scrollX_ul>li {
+				float: left;
+				height: 100%;
+			}
+			
+			.scrollX_ul>li img {
+				width: 100%;
+				height: 100%;
+			}
+			/*上下移动切换*/
+			
+			.scrollY_ul {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+			}
+			
+			.scrollY_ul>li {
+				height: 100%;
+				width: 100%;
+			}
+			
+			.scrollY_ul>li img {
+				width: 100%;
+				height: 100%;
+			}
+			/*
+			 * 表单的提交及验证
+			 */
+			
+			.form_area {
+				width: 100%;
+				overflow: hidden;
+				font-size: 16px;
+			}
+			
+			.required {
+				color: #f12315;
+				margin-right: 5px;
+			}
+			/*失败*/
+			
+			.form_area .public_form.error .info_field .form_text {
+				border: 1px solid #e9574d;
+				color: #e9574d;
+			}
+			
+			.form_area .public_form.error .prompt_message {
+				color: #e9574d;
+			}
+			/*成功*/
+			
+			.form_area .public_form.success .info_field .form_text {
+				border: 1px solid #4bb900;
+				color: #4bb900;
+			}
+			
+			.form_area .public_form.success .prompt_message {
+				color: #4bb900;
+			}
+			/*提交按钮*/
+			
+			.form_area .btn_area {
+				overflow: hidden;
+			}
+			
+			.form_area .btn_area .submit_btn {
+				height: 40px;
+				line-height: 40px;
+				text-align: center;
+				display: inline-block;
+				padding: 0 10px;
+				font-size: 16px;
+				width: 100px;
+				margin-left: 20%;
+				border-radius: 5px;
+				cursor: pointer;
+				background-color: #4bb900;
+				color: #ffffff;
+				border: 0;
+			}
+			/*单行单列表格*/
+			
+			.single_form .public_form {
+				height: 40px;
+				line-height: 40px;
+				margin-bottom: 15px;
+				display: table;
+				width: 100%;
+			}
+			
+			.single_form .public_form .info_name {
+				width: 20%;
+				text-align: right;
+				padding-right: 20px;
+				display: table-cell;
+				vertical-align: middle;
+			}
+			
+			.single_form .public_form .info_field {
+				width: 60%;
+				text-align: left;
+				display: table-cell;
+			}
+			/*input,selece框*/
+			.single_form .public_form .info_field .form_text {
+				width: 100%;
+				height: 40px;
+				line-height: 40px;
+				border: 1px solid #c7c7c7;
+				padding-left: 15px;
+				display: inline-block;
+				border-radius: 4px;
+			}
+			
+			/*textarea框*/
+			.single_form .public_form .info_field .form_textarea{
+				height: auto;
+				line-height: 30px;
+			}
+			
+			
+			.single_form .public_form .prompt_message {
+				display: table-cell;
+				padding-left: 15px;
+				line-height: 20px;
+				font-size: 14px;
+				vertical-align: middle;
+			}
+			
+			/*
+			 * 模态框
+			 */
+			.modle_open{
+				overflow: hidden;
+				padding-right: 17px;
+			}
+			
+			.modle {
+				display: none;
+				position: fixed;
+				z-index: 5;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+			}
+			
+			.modle_bg {
+				width: 100%;
+				height: 100%;
+				background-color: #000;
+				opacity: 0.3;
+				-webkit-opacity: 0.3;
+				-khtml-opacity: 0.3;
+				-moz-opacity: 0.3;
+				filter: Alpha(opacity=30);
+				z-index: 5;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+			
+			.modle_content {
+				padding: 20px;
+				background-color: #FFFFFF;
+				z-index: 8;
+				position: absolute;
+				left: 50%;
+				height: 500px;
+			}
+			
+			/*关闭按钮（可以自己调整样式哦）*/
+			.modle_close{
+				display: block;
+				width: 50px;
+				height: 50px;
+			  background-color: red;
+			  cursor: pointer;
+			  color: #ffffff;
+			}
+			
+			/*
+			 * 悬浮框
+			 */
+			
+			/*悬浮框*/
+			.float{
+				width: 100px;
+				height: 100px;
+				background-color: red;
+				position: absolute;
+			}
+			
+			/*关闭按钮（可以自己调整样式哦）*/
+			.suspend_area .close{
+				position: absolute;
+				top: 0;
+				right: 0;
+				width: 20px;
+				height: 20px;
+				background-color: black;
+				cursor: pointer;
+			}
+			
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/myJs.js"></script>
+		<script>
+			$(function() {
+				
+				//页面加载中
+				jQuery.loading($('.loading'));
+				
+				//tab切换
+				$('.change_nav').changeTab({
+					checkedArea: '.a span', //点击选择区域
+					changeArea: '.b p', //切换区域
+					checkedClass: 'active', //特殊的class
+					manyTimes: false,
+					callBack: $.noop //切换完成后的回调函数
+				})
+
+				//进度条
+				$(".c").progress({
+					percent: 0.6, //百分比
+					speed: 1, //速度
+					color: '#653535', //颜色
+					autoPlay: true, //页面刷新是否自动滚动
+					showPercent: true, //是否显示百分比
+					callBack: function() {
+
+					}, //回调函数
+				});
+
+				//图片轮播
+				$(".d").carousel({
+					way: 'fade', //轮播方式（fade，scrollX，scrollY）
+					speed: 500, //轮播速度
+					timer: 2000, //自动播放时间隔
+					showButton: true, //是否显示底部圆角
+					showArrow: true, //是否显示左右箭头
+					autoPlay: true, //是否自动播放
+				});
+
+				//表单的验证
+				$('.form_div .single_form').formValid();
+				
+				//模态框
+				$(".modle_button").modle({
+					modle: '.modle_1', //模态框的class
+					modleWay: 'top' //模态框的弹出方式
+				});
+				
+				//漂浮框
+				$('.float').suspend({
+					autoFloat: true, //是否自动漂浮
+					speed: 10 //漂浮速度
+				});
+				
+			})
+		</script>
+	</head>
+
+	<body>
+		
+		
+		<!--
+        	作者：offline
+        	时间：2017-12-13
+        	描述：页面加载中
+        -->
+		<div class="loading">
+			<!--加载动画-->
+			<div class="spinner">
+				<div class="spinner-container container1">
+					<div class="circle1"></div>
+					<div class="circle2"></div>
+					<div class="circle3"></div>
+					<div class="circle4"></div>
+				</div>
+				<div class="spinner-container container2">
+					<div class="circle1"></div>
+					<div class="circle2"></div>
+					<div class="circle3"></div>
+					<div class="circle4"></div>
+				</div>
+				<div class="spinner-container container3">
+					<div class="circle1"></div>
+					<div class="circle2"></div>
+					<div class="circle3"></div>
+					<div class="circle4"></div>
+				</div>
+			</div>
+		</div>
+		
+		<!--
+      	描述：tab表切换
+      -->
+    <div class="change_nav">
+			<div class="a">
+				<span class="active">1</span>
+				<span>2</span>
+			</div>
+			<div class="b">
+				<p>1</p>
+				<p style="display: none;">2</p>
+			</div>
+		</div>
+
+		<!--
+        	描述：进度条
+    -->
+
+		<div class="c">
+
+		</div>
+
+		<!--
+        	描述：图片轮播
+    -->
+		<div class="d">
+			<ul class="carousel_ul">
+				<li>
+					<a href="#"><img src="img/1.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/2.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/3.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/4.jpg"></a>
+				</li>
+			</ul>
+		</div>
+
+		<!--
+        	描述：表单的提交及验证
+    -->
+		<div class="form_div" style="width: 800px;margin: 20px auto 0;">
+			<div>
+				<form class="form_area single_form">
+					<!-- 姓名 -->
+					<div class="public_form">
+						<div class="info_name">
+							<label class="required">*</label>姓名
+						</div>
+						<div class="info_field">
+							<input type="text" class="form_text" name="name" />
+						</div>
+						<div class="prompt_message"></div>
+					</div>
+					<div class="public_form">
+						<div class="info_name">
+							<label class="required">*</label>密码
+						</div>
+						<div class="info_field">
+							<input type="password" class="form_text" name="password1" />
+						</div>
+						<div class="prompt_message"></div>
+					</div>
+					<div class="public_form">
+						<div class="info_name">
+							确认密码
+						</div>
+						<div class="info_field">
+							<input type="password" class="form_text" name="password2" />
+						</div>
+						<div class="prompt_message"></div>
+					</div>
+					<div class="public_form">
+						<div class="info_name">
+							邮箱
+						</div>
+						<div class="info_field">
+							<input type="email" class="form_text" name="email" />
+						</div>
+						<div class="prompt_message"></div>
+					</div>
+					<div class="public_form">
+						<div class="info_name">
+							手机号
+						</div>
+						<div class="info_field">
+							<input type="email" class="form_text" name="phone" />
+						</div>
+						<div class="prompt_message"></div>
+					</div>
+					<div class="public_form">
+						<div class="info_name">
+							<label class="required">*</label>描述
+						</div>
+						<div class="info_field">
+							<textarea name="describe" placeholder="不超过100字" class="form_text form_textarea" rows="5"></textarea>
+						</div>
+						<div class="prompt_message"></div>
+					</div>
+					<div class="btn_area">
+						<input type="submit" class="submit_btn" value="提交" />
+					</div>
+				</form>
+			</div>
+		</div>
+		
+		<!--
+			描述：模态框
+		-->
+		<button class="modle_button">
+			点击即可出现模态框
+		</button>
+
+		<div class="modle modle_1">
+			<div class="modle_bg">
+
+			</div>
+
+			<div class="modle_content">
+         <a class="modle_close">
+         	 关闭
+         </a>
+			</div>
+		</div>
+		
+		<!--
+			描述：悬浮框
+		-->
+		<div class="float suspend_area">
+			<div class="close"></div>
+		</div>
+
+	</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>简单的tab插件</title>
+		<style>
+			.active {
+				background: red;
+			}
+			
+			.change_area>div {
+				display: none;
+			}
+			
+			.change_area>div:first-child {
+				display: block;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			//jquery新增方法
+			;
+			(function($, window, document, undefined) {
+
+				//定义一个构造函数
+				var ChangeTab = function(ele, opt) {
+					this.$element = ele,
+						//默认数值
+						this.defaults = {
+							//轮播方式（默认为按以透明度变化轮播）
+						  'way': 'fade',
+
+							//切换区域
+							'changeArea': $.noop,
+
+							//给点击元素新增的元素
+							'checkedClass': 'active',
+
+							//是否复用
+							'manyTimes': false,
+
+							//回调函数
+							'callBack': $.noop()
+						},
+						this.options = $.extend({}, this.defaults, opt)
+				}
+
+				ChangeTab.prototype = {
+
+					//定义一个点击事件的方法
+					clickChange: function(self) {
+						var num = $(self).index();
+						$(self).addClass(this.options.checkedClass).siblings(this.options.checkedArea).removeClass(this.options.checkedClass);
+						//判断是否需要复用
+						if(this.options.manyTimes) {
+							$(self).closest(this.$element.selector).find(this.options.changeArea).eq(num).show().siblings().hide();
+						} else {
+							$(this.options.changeArea).eq(num).show().siblings().hide();
+						}
+						//回调函数
+						if(this.options.callBack!=$.noop()) {
+							this.options.callBack(self);
+						}
+					}
+				}
+
+				//在插件中使用这个对象
+				$.fn.changeTab = function(options) {
+					//创建Beautifier的实体
+					var changeTab = new ChangeTab(this, options);
+
+					//调用构造函数的方法
+					$(document).on('click', changeTab.options.checkedArea, function() {
+						changeTab.clickChange(this);
+					})
+				}
+			})(jQuery, window, document);
+		</script>
+		<script>
+			$(function() {
+				$('.a').changeTab({
+					checkedArea: '.change_tab>span', //点击选择区域
+					changeArea: '.change_area>div', //切换区域
+					checkedClass: 'active', //特殊的class
+					manyTimes: true, //页面是否会复用
+					callBack: function(self) {
+						alert(111);
+					} //切换完成后的回调函数
+				});
+			})
+		</script>
+	</head>
+
+	<body>
+		<div class="a">
+			<div class="change_tab">
+				<span class="active">1</span>
+				<span>2</span>
+			</div>
+
+			<div class="change_area">
+				<div>1234</div>
+				<div>43211</div>
+			</div>
+		</div>
+
+		<div class="a">
+			<div class="change_tab">
+				<span class="active">1</span>
+				<span>2</span>
+			</div>
+
+			<div class="change_area">
+				<div>7896</div>
+				<div>454334</div>
+			</div>
+		</div>
+
+	</body>
+
+</html>

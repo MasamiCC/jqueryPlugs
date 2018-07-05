@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+				width: 100%;
+				text-align: center;
+				vertical-align: middle;
+			}
+			
+			table td {
+				border: 1px solid red;
+				height: 35px;
+				line-height: 35px;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			(function($) {
+				$.fn.mergeSpan = function(options) {
+					options = $.extend({
+						cols: $.noop,
+					}, options);
+
+					var cols = options.cols;
+
+					var $_table = $(this);
+
+					//增加colspan方法
+					var mergeCell = function($table, colIndex) {
+						$table.data('col-content', ''); // 存放单元格内容
+						$table.data('col-rowspan', 1); // 存放计算的rowspan值  默认为1
+						$table.data('col-td', $()); // 存放发现的第一个与前一行比较结果不同td(jQuery封装过的), 默认一个"空"的jquery对象
+						$table.data('trNum', $('tbody tr', $table).length); // 要处理表格的总行数, 用于最后一行做特殊处理时进行判断之用
+						$('tbody tr', $table).each(function(index) {
+							// td:eq中的colIndex即列索引
+							var $td = $('td:eq(' + colIndex + ')', this);
+
+							// 取出单元格的当前内容
+							var currentContent = $td.html();
+
+							// 第一次时走此分支
+							if($table.data('col-content') == '') {
+
+								$table.data('col-content', currentContent);
+								$table.data('col-td', $td);
+
+							} else {
+								// 上一行与当前行内容相同
+								if($table.data('col-content') == currentContent) {
+									// 上一行与当前行内容相同则col-rowspan累加, 保存新值
+									var rowspan = $table.data('col-rowspan') + 1;
+									$table.data('col-rowspan', rowspan);
+									// 值得注意的是  如果用了$td.remove()就会对其他列的处理造成影响
+									$td.hide();
+
+									// 最后一行的情况比较特殊一点
+									// 比如最后2行 td中的内容是一样的, 那么到最后一行就应该把此时的col-td里保存的td设置rowspan
+									if(++index == $table.data('trNum'))
+										$table.data('col-td').attr('rowspan', $table.data('col-rowspan'));
+
+								} else { // 上一行与当前行内容不同
+									// col-rowspan默认为1, 如果统计出的col-rowspan没有变化, 不处理
+									if($table.data('col-rowspan') != 1) {
+										$table.data('col-td').attr('rowspan', $table.data('col-rowspan'));
+									}
+									// 保存第一次出现不同内容的td, 和其内容, 重置col-rowspan
+									$table.data('col-td', $td);
+									$table.data('col-content', $td.html());
+									$table.data('col-rowspan', 1);
+								}
+							}
+						});
+
+					}
+
+					for(var i = cols.length - 1; cols[i] != undefined; i--) {
+						mergeCell($_table, cols[i]);
+					}
+
+					return this;
+				}
+
+			})(window.jQuery)
+		</script>
+		<script>
+			$(function() {
+				$('table').mergeSpan({
+					cols: [1]
+				})
+			})
+		</script>
+	</head>
+
+	<body>
+		<table>
+			<tr>
+				<td>这是第一个</td>
+				<td>a</td>
+				<td>你好呀</td>
+				<td>这是</td>
+				<td>第一个</td>
+			</tr>
+			<tr>
+				<td>这是第二个</td>
+				<td>a</td>
+				<td>我好呀</td>
+				<td>试着</td>
+				<td>第二个</td>
+			</tr>
+			<tr>
+				<td>这是第二个</td>
+				<td>b</td>
+				<td>我好呀</td>
+				<td>试着</td>
+				<td>第二个</td>
+			</tr>
+			<tr>
+				<td>这是第二个</td>
+				<td>a</td>
+				<td>我好呀</td>
+				<td>试着</td>
+				<td>第二个</td>
+			</tr>
+		</table>
+	</body>
+
+</html>

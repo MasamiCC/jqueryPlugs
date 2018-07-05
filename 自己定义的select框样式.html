@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>自己定义的select框样式</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			ul,
+			li {
+				list-style: none;
+			}
+			
+			.select_area {
+				width: 500px;
+				position: relative;
+				height: 50px;
+				cursor: pointer;
+				float: left;
+			}
+			
+			.select {
+				width: 100%;
+				height: 50px;
+				line-height: 50px;
+			}
+			
+			/*select区域*/
+			.selectric {
+				width: 100%;
+				height: 50px;
+				line-height: 50px;
+				border: 1px solid #DDD;
+				border-radius: 0px;
+				background: #FFFFFF;
+				position: relative;
+				overflow: hidden;
+				padding: 0 15px;
+			}
+			
+			.selectric:hover {
+				border: 1px solid #c4c4c4;
+			}
+			
+			.selectric:hover b {
+				color: #a2a2a2;
+			}
+			
+			.selectric .selectric_span {
+				display: block;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				font-size: 14px;
+				color: #444;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+			}
+			
+			.selectric>b {
+				display: block;
+				position: absolute;
+				right: 0;
+				top: 0;
+				width: 50px;
+				height: 50px;
+				line-height: 50px;
+				color: #BBB;
+				text-align: center;
+			}
+			
+			/*option区域*/
+			.selectric-items {
+				position: absolute;
+				top: 100%;
+				left: 0;
+				width: 100%;
+				overflow-y: auto;
+				background: #FFFFFF;
+				border: 1px solid #c4c4c4;
+				border-top: 0;
+				z-index: -1;
+				box-shadow: 0 0 10px -6px;
+				visibility: hidden;
+				z-index: 9;
+			}
+			
+			/*option内容摆放区*/
+			.selectric-scroll {
+				width: 100%;
+				max-height: 250px;
+				overflow-y: auto;
+				background: #FFFFFF;
+			}
+			
+			.selectric-items ul>li {
+				height: 50px;
+				line-height: 50px;
+				padding: 0 15px;
+				cursor: pointer;
+				text-align-last: justify;
+			}
+			
+			
+			.selectric-items ul>li.active {
+				background-color: #D0D0D0;
+			}
+			
+			.selectric-items ul>li:hover {
+				background-color: #D0D0D0;
+			}
+			
+			/*搜索框*/
+			.selectric_field{
+				height: 50px;
+				line-height: 50px;
+				padding-left: 15px;
+				border-bottom: 1px solid #C7C7C7;
+			}
+			
+			.selectric_field .select2_input{
+				height: 30px;
+				width: 80%;
+				border: 1px solid #aaa;
+				border-radius: 30px;
+				font-size: 16px;
+				padding-left: 15px;
+			}
+			
+		</style>
+		<link rel="stylesheet" href="css/jquery.mCustomScrollbar.min.css" />
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+		<script type="text/javascript" src="js/myJs.js" ></script>
+		<script>
+			$(function() {
+				//调用方法
+				$('select').selectric();
+			})
+		</script>
+	</head>
+
+	<body>
+		<div class="select_area">
+			<select class="select">
+				<option>洒洒水啦洒洒水啦洒洒水</option>
+				<option>2</option>
+			</select>
+		</div>
+
+		<div class="select_area">
+			<select class="select">
+				<option>你好呀</option>
+				<option>打搅好</option>
+				<option>洒洒水啦</option>
+				<option>你好呀</option>
+				<option>打搅好</option>
+				<option>洒洒水啦</option>
+			</select>
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>搜索框的定位效果</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			body {
+				height: 3000px;
+			}
+			
+			.search_area {
+				height: 60px;
+				line-height: 60px;
+				width: 1200px;
+				margin: 50px auto;
+				background-color: red;
+			}
+			
+			.search_area.search_flex{
+				position: fixed;
+				top: 0px;
+				width: 100%;
+				background: black;
+				margin: 0;
+				animation: searchTop .5s ease-in-out;
+				-webkitanimation: searchTop .5s ease-in-out;
+			}
+			
+			@keyframes searchTop {
+				from {
+					top: -200px
+				}
+				to {
+					top: 0
+				}
+			}
+			
+			@-webkit-keyframe searchTop {
+				from {
+					top: -200px
+				}
+				to {
+					top: 0
+				}
+			}
+			
+			
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			(function($) {
+				//搜索栏定位
+				$.fn.searchFix = function(options) {
+					options = $.extend({
+						//电梯区域
+						height: $.noop,
+						
+						//增加的class
+						addClass: $.noop,
+					}, options);
+
+					//搜索栏
+					var $_slef = $(this);
+					//滚动多高后出现
+					var height = options.height;
+					//增加的class
+					var addClass = options.addClass;
+					//滚动条定位是否开启
+					var isFix = false;
+					//定义document距离屏幕的高度
+					var winPos;
+					
+					//监听浏览器滚动事件
+					$(window).scroll(function(event) {
+						winPos = $(window).scrollTop();
+						
+						if(winPos >= height && !isFix){
+							$_slef.addClass(addClass);
+							isFix = true;
+						}else if(winPos < height && isFix){
+							$_slef.removeClass(addClass);
+							isFix = false;
+						}
+
+						
+						
+					})
+					
+
+					return this;
+				}
+
+			})(window.jQuery)
+		</script>
+
+		<script>
+			$(function() {
+
+				//调用方法
+				$('.search_area').searchFix({
+					height: 160, //滚动多高后出现
+					addClass: 'search_flex'//新增的class
+				})
+
+			})
+		</script>
+	</head>
+
+	<body>
+		<form class="search_area">
+			<input type="text" />
+		</form>
+	</body>
+
+</html>

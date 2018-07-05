@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			body{
+				height: 1000px;
+				width: 100%;
+			}
+		</style>
+	</head>
+
+	<body>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/myJs.js"></script>
+		<script type="text/javascript" src="js/mui.min.js" ></script>
+		<script>
+			mui.init({
+        gestureConfig: {
+            swipeleft: true
+        }
+      });
+			$(function(){
+				if(jQuery.isPc()) {
+				alert(11)
+			} else {
+				$(document).on('swipeleft','body',function(){
+					alert(1111);
+				})
+
+			}
+			})
+		</script>
+	</body>
+
+</html>

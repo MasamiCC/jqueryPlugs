@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			ul,
+			li {
+				list-style: none;
+			}
+			/*在这里设置样式哦*/
+			/*主体样式*/
+			/*按透明度切换*/
+			
+			.a,
+			.b,
+			.c,
+			.d,
+			.e {
+				position: relative;
+				width: 550px;
+				height: 340px;
+				overflow: hidden;
+			}
+			/*
+			 * 这些是必须加上的哟
+			 */
+			/*这些你可以自己改动，如果你会的话*/
+			/*公共下圆角*/
+			
+			.position_ul {
+				height: 35px;
+				line-height: 35px;
+				padding-right: 15px;
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				margin: 0;
+				width: 100%;
+				background-color: rgba(0, 0, 0, 0.4);
+				text-align: right;
+			}
+			
+			.position_ul li {
+				display: inline-block;
+				margin-top: 15px;
+				cursor: pointer;
+				width: 10px;
+				height: 10px;
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+				border-radius: 5px;
+				background: #333;
+				margin-right: 5px;
+				background-color: #FFFFFF;
+			}
+			
+			.position_ul li.cur {
+				background: #C70128;
+			}
+			/*公共左右箭头*/
+			
+			.prev,
+			.next {
+				position: absolute;
+				top: 40%;
+				display: block;
+				width: 20px;
+				height: 30px;
+				z-index: 2;
+				cursor: pointer;
+				background-color: red;
+			}
+			
+			.prev {
+				left: 0;
+			}
+			
+			.next {
+				right: 0;
+			}
+			
+			.prev.stop,
+			.next.stop {
+				background-color: black;
+			}
+			/*依靠透明度变化*/
+			
+			.fade_ul>li {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			/*图片高度自适应*/
+
+			/*左右移动切换*/
+			
+			.scrollX_ul {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+			}
+			
+			.scrollX_ul>li {
+				float: left;
+				height: 100%;
+			}
+			
+			.scrollX_ul>li img {
+				width: 100%;
+				height: 100%;
+			}
+			/*上下移动切换*/
+			
+			.scrollY_ul {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+			}
+			
+			.scrollY_ul>li {
+				height: 100%;
+				width: 100%;
+			}
+			
+			.scrollY_ul>li img {
+				width: 100%;
+				height: 100%;
+			}
+			/*一面显示多图片左右切换*/
+			
+			.scrolls_x_ul {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+			}
+			
+			.scrolls_x_ul>li {
+				height: 100%;
+				padding: 20px;
+				float: left;
+			}
+			
+			.scrolls_x_ul>li img {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.carousels_div {
+				width: 90%;
+				height: 100%;
+				margin: 0 auto;
+				overflow: hidden;
+				position: relative;
+			}
+			/*类似于公告的上下移动*/
+			
+			.scrolls_y_ul {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+				width: 100%;
+			}
+			
+			.scrolls_y_ul>li {
+				width: 100%;
+				padding: 10px;
+			}
+			
+			.scrolls_y_ul>li img {
+				width: 100%;
+				height: 100%;
+			}
+			
+			.a_1 {
+				width: 100%;
+				height: 100%;
+				position: relative;
+				overflow: hidden;
+			}
+			
+			.a_1 p {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				width: 100%;
+				height: 100%;
+			}
+			
+			.a_1 p>img {
+				height: auto;
+				transition: all 0.7s ease-out;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			//jquery新增方法
+			;
+			(function($, window, document, undefined) {
+
+				//定义一个构造函数
+				var ImgZoom = function(ele, opt) {
+					//定义一个原始对象
+					this.$element = ele,
+
+						//默认图片大小比例
+						this.zoom = 1,
+
+						//默认图片旋转方向
+						this.roate = 0,
+
+						//默认数值
+						this.defaults = {
+							//基础属性
+							basic: {
+								//图片摆放位置对象
+								'imgArea': $.noop,
+								//图片对象
+								'img': $.noop,
+								//图片是否可移动
+								'isMove': false,
+							},
+							operate: {
+								//缩放功能
+								'zoom': false,
+								//旋转功能
+								'rotate': false,
+							}
+						},
+						this.options = $.extend({}, this.defaults, opt)
+				}
+
+				ImgZoom.prototype = {
+
+					//定义一个确定图片css的方法
+					imgCss: function() {
+						$(this.options.basic.img).css({
+							"transform": "scale(" + this.zoom + ")" + "rotate(" + this.roate + "deg)",
+						});
+					},
+
+					//定义一个图片放大的方法
+					enlarge: function() {
+						this.zoom += .1;
+						this.imgCss();
+					},
+
+					//定义一个图片缩小的方法
+					shrink: function() {
+						if(this.zoom > .2) {
+							this.zoom -= .1;
+						}
+						this.imgCss();
+					},
+
+					//定义一个鼠标滚轮滚动
+					wheel: function(e) {
+						e = e || window.event;
+						if(e.wheelDelta) { //IE/Opera/Chrome 
+							var distance = e.wheelDelta;
+							if(distance > 0) {
+								this.shrink();
+							} else {
+								this.enlarge();
+							}
+						} else if(e.detail) { //Firefox 
+							t2.value = e.detail;
+						}
+					},
+
+					//定义一个图片左旋
+					rotateLeft: function() {
+						this.roate += 45;
+						this.imgCss();
+					},
+
+					//定义一个图片右旋
+					rotateRight: function() {
+						this.roate -= 45;
+						this.imgCss();
+					}
+				}
+
+				//在插件中使用这个对象
+				$.fn.imgZoom = function(options) {
+					//创建Beautifier的实体
+					var imgZoom = new ImgZoom(this, options);
+
+					//选取的对象class
+					var selector = imgZoom.$element.selector;
+
+					//图片是否允许移动
+					if(imgZoom.options.basic.isMove) {
+						//绑定鼠标左键按下事件
+						$(imgZoom.options.basic.imgArea + ' p').bind('mousedown', function(event) {
+							event.preventDefault && event.preventDefault();
+							var offset_x = $(this)[0].offsetLeft; //x坐标
+							var offset_y = $(this)[0].offsetTop; //y坐标
+							//获取当前鼠标的坐标
+							var mouse_x = event.pageX;
+							var mouse_y = event.pageY;
+							//绑定拖动事件
+							$(imgZoom.options.basic.imgArea).bind("mousemove", function(ev) {
+								// 计算鼠标移动了的位置
+								var _x = ev.pageX - mouse_x;
+								var _y = ev.pageY - mouse_y;
+
+								//设置移动后的元素坐标
+								var now_x = (offset_x + _x) + "px";
+								var now_y = (offset_y + _y) + "px";
+
+								//改变目标元素的位置
+								$(imgZoom.options.basic.imgArea + ' p').css({
+									top: now_y,
+									left: now_x
+								});
+							})
+
+						});
+
+						//当鼠标左键松开，接触事件绑定
+						$(imgZoom.options.basic.imgArea).bind("mouseup", function() {
+							$(this).unbind("mousemove");
+						});
+					};
+
+					//图片的操作
+
+					//图片放大缩小
+					if(imgZoom.options.operate.zoom) {
+						$(imgZoom.options.basic.imgOperate).append("<span class='enlarge'>放大</span><span class='shrink'>缩小</span>");
+
+						//放大按钮被点击
+						$(document).on('click', selector + ' .enlarge', function() {
+							imgZoom.enlarge();
+						});
+
+						//缩小按钮被点击
+						$(document).on('click', selector + ' .shrink', function() {
+							imgZoom.shrink();
+						});
+
+						$(imgZoom.options.basic.imgArea).hover(function() {
+							$(document).bind('mousewheel', function(event, delta) {
+								return false;
+							});
+						})
+
+						//鼠标滚轮事件
+						$(document).on('mousewheel', imgZoom.options.basic.imgArea, function(e) {
+							imgZoom.wheel();
+						})
+
+					};
+
+					//图片的旋转
+					if(imgZoom.options.operate.rotate) {
+						$(imgZoom.options.basic.imgOperate).append("<span class='rotate_left'>左旋</span><span class='rotate_right'>右旋</span>");
+
+						//左旋按钮被点击
+						$(document).on('click', selector + ' .rotate_left', function() {
+							imgZoom.rotateLeft();
+						});
+
+						//鼠标滚轮事件
+						$(document).on('click', selector + ' .rotate_right', function(e) {
+							imgZoom.rotateRight();
+						})
+					}
+
+				}
+			})(jQuery, window, document);
+			(function($) {
+				/*
+				 * 图片轮播插件
+				 *
+				 */
+				$.fn.carousel = function(options) { //定义插件方法名
+					options = $.extend({
+						//定义一个对象，设置默认值
+
+						//轮播方式（默认为按以透明度变化轮播）
+						way: 'fade',
+
+						//一列显示的图片数量（默认为1）
+						num: 1,
+
+						//滚动速度（默认为100）
+						speed: 100,
+
+						//滚动间隔时间（默认为100）
+						timer: 100,
+
+						//是否显示下圆角（默认为false）
+						showButton: false,
+
+						//是否显示左右箭头（默认为false）
+						showArrow: false,
+
+						//是否自动播放（默认为false）
+						autoPlay: false,
+
+						//图片高度是否需要自适应
+						imgHeight: $.noop,
+
+						//是否一直循环
+						isLoop: false,
+
+					}, options);
+
+					//轮播方式
+					var way = options.way;
+					//显示数量
+					var num = options.num;
+					//轮播速度
+					var speed = options.speed;
+					//轮播间隔
+					var timer = options.timer;
+					//是否显示下圆角
+					var showButton = options.showButton;
+					//是否显示左右箭头
+					var showArrow = options.showArrow;
+					//是否自动播放
+					var autoPlay = options.autoPlay;
+					//图片高度是否自适应
+					var imgHeight = options.imgHeight;
+					//是否一直循环
+					var isLoop = options.isLoop;
+
+					//获取页面元素
+					var $content = $(this);
+					var $contentDiv = $(this).find('.carousels_div');
+					var $contentUl = $(this).find('.carousel_ul');
+					var $contentLi = $contentUl.children('li');
+					var page_count = $contentLi.length;
+
+					//先判断图片元素是否符合要求
+					if($content.width() > 0 && $content.height() > 0) {
+
+					} else {
+						alert("请设置元素高度，宽度再来使用好吧")
+					}
+
+					//图片高度是否需要自适应
+					if(imgHeight === 'auto') {
+						//找到图片元素
+						var $_img = $content.find('img');
+						$content.height($_img.height());
+					}
+
+					//一面显示多图片时触发
+					if(num > 1 && way === 'scrolls_x') {
+						var li_width = $contentDiv.outerWidth() / num;
+						$contentLi.outerWidth(li_width);
+					} else if(num > 1 && way === 'scrolls_y') {
+						var li_height = $content.height() / num;
+						$contentLi.height(li_height);
+					}
+
+					//如果显示下圆角为true
+					if(showButton && num === 1) {
+						var $positionUl = $("<ul class='position_ul'></ul>");
+						$content.append($positionUl);
+						for(var i = 1; i <= page_count; i++) {
+							$positionUl.append("<li></li>");
+						}
+						$positionUl.find('li').eq(0).addClass('cur');
+						var id;
+						var _this;
+						$positionUl.find('li').hover(function() {
+							_this = $(this);
+							id = setTimeout(mouseOver, 100);
+						}, function() {
+							if(id) {
+								clearTimeout(id);
+							}
+						});
+					}
+
+					//如果显示左右箭头为true
+					if(showArrow) {
+						var $prev = $("<span class='prev'></span>");
+						var $next = $("<span class='next'></span>");
+						$content.append($prev);
+						$content.append($next);
+						var time = 0;
+						$next.click(function() {
+							//判断计时器是否处于关闭状态(为了解决多次点击问题)
+							if(time == 0) {
+								time = 1; //设定间隔时间（秒）
+
+								//启动计时器，倒计时time秒后自动关闭计时器。
+								var index = setInterval(function() {
+									time--;
+									if(time == 0) {
+										clearInterval(index);
+									}
+								}, 500);
+
+								playLeft();
+							}
+						});
+
+						$prev.click(function() {
+							//判断计时器是否处于关闭状态(为了解决多次点击问题)
+							if(time == 0) {
+								time = 1; //设定间隔时间（秒）
+
+								//启动计时器，倒计时time秒后自动关闭计时器。
+								var index = setInterval(function() {
+									time--;
+									if(time == 0) {
+										clearInterval(index);
+									}
+								}, 500);
+
+								playRight();
+							}
+						});
+					}
+					//设置左移函数
+					var playLeft;
+					//设置右移函数
+					var playRight;
+					//设置鼠标移入函数
+					var mouseOver;
+
+					switch(way) {
+						//渐变(透明度)切换
+						case 'fade':
+							//隐藏所有li，显示第一个li
+							$contentLi.hide();
+							$contentLi.eq(0).show();
+							$contentUl.addClass('fade_ul');
+							var i = 0;
+							//左移函数
+							playLeft = function() {
+								i++;
+								i = i > page_count - 1 ? 0 : i;
+								$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								$contentLi.eq(i).fadeIn(speed).siblings().fadeOut(speed);
+							}
+
+							//右移函数
+							playRight = function() {
+								i--;
+								i = i < 0 ? page_count - 1 : i;
+								$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								$contentLi.eq(i).fadeIn(speed).siblings().fadeOut(speed);
+							}
+
+							//鼠标移入圆角函数
+							mouseOver = function(a) {
+								_this.addClass('cur').siblings().removeClass("cur");
+								var index = _this.index();
+								i = index;
+								$contentLi.eq(i).fadeIn(speed).siblings().fadeOut(speed);
+							}
+							break;
+
+							//左右切换
+						case 'scrollX':
+							$contentUl.addClass('scrollX_ul');
+							var v_width = $content.outerWidth();
+							$contentLi.outerWidth(v_width);
+							$contentUl.width(v_width * page_count);
+							var i = 0;
+							playLeft = function() {
+								if(i >= page_count - 1) {
+									i = 0;
+									$contentUl.animate({
+										left: '0px'
+									}, speed);
+									$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								} else {
+									i++;
+									$contentUl.animate({
+										left: '-=' + v_width
+									}, speed);
+									$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								}
+							}
+
+							playRight = function() {
+								if(i == 0) {
+									i = page_count - 1;
+									$contentUl.animate({
+										left: '-=' + v_width * (page_count - 1)
+									}, speed);
+									$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								} else {
+									i--;
+									$contentUl.animate({
+										left: '+=' + v_width
+									}, speed);
+									$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								}
+							}
+
+							//鼠标移入圆角函数
+							mouseOver = function() {
+								_this.addClass('cur').siblings().removeClass("cur");
+								var index = _this.index();
+								i = index;
+								$contentUl.animate({
+									left: -v_width * i
+								}, "slow");
+							}
+
+							break;
+
+							//上下切换
+						case 'scrollY':
+							$contentUl.addClass('scrollY_ul');
+							var i = 0;
+							var v_height = $content.height();
+							playLeft = function() {
+								if(i >= page_count - 1) {
+									i = 0;
+									$contentUl.animate({
+										top: '0px'
+									}, speed);
+									$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								} else {
+									i++;
+									$contentUl.animate({
+										top: '-=' + v_height
+									}, speed);
+									$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								}
+							}
+
+							playRight = function() {
+								if(i == 0) {
+									i = page_count - 1;
+									$contentUl.animate({
+										top: '-=' + v_height * (page_count - 1)
+									}, speed);
+									$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								} else {
+									i--;
+									$contentUl.animate({
+										top: '+=' + v_height
+									}, speed);
+									$positionUl.find('li').eq(i).addClass('cur').siblings().removeClass("cur");
+								}
+							}
+
+							//鼠标移入圆角函数
+							mouseOver = function() {
+								_this.addClass('cur').siblings().removeClass("cur");
+								var index = _this.index();
+								i = index;
+								$contentUl.animate({
+									top: -v_height * i
+								}, "slow");
+							}
+
+							break;
+
+							//多图片左右切换
+						case 'scrolls_x':
+							$contentUl.addClass('scrolls_x_ul');
+							//移动距离
+							var v_width = $contentLi.outerWidth();
+							$contentUl.outerWidth(v_width * ($contentUl.find('li').length + 1));
+							var i = 0;
+							//判断是否一直循环
+							if(isLoop) {
+								//复制ul里的元素
+								var cloneLi = $contentLi.clone();
+								$contentUl.append(cloneLi);
+								//左移函数
+								playLeft = function() {
+									if(i > page_count - num) {
+										i = 0;
+										$contentUl.animate({
+											left: '-=' + v_width
+										}, speed, function() {
+											$contentUl.css('left', '0px');
+										});
+									} else {
+										i++;
+										$contentUl.animate({
+											left: '-=' + v_width
+										}, speed);
+									}
+								}
+							} else {
+								$prev.addClass('stop');
+
+								//左移函数
+								playLeft = function() {
+									if(i < page_count - num) {
+										$prev.removeClass('stop');
+										$next.removeClass('stop');
+										i++;
+										$contentUl.animate({
+											left: '-=' + v_width
+										}, speed, function() {
+											if(i == page_count - num) {
+												$next.addClass('stop');
+											}
+										});
+									}
+								}
+
+								//右移函数
+								playRight = function() {
+									if(i > 0) {
+										$prev.removeClass('stop');
+										$next.removeClass('stop');
+										i--;
+										$contentUl.animate({
+											left: '+=' + v_width
+										}, speed, function() {
+											if(i == 0) {
+												$prev.addClass('stop');
+											}
+										});
+									}
+								}
+
+							}
+
+							break;
+							//类似公告的上下切换
+						case 'scrolls_y':
+							showButton = false;
+							showArrow = false;
+							$contentUl.addClass('scrolls_y_ul');
+
+							//复制ul里的元素
+							var cloneLi = $contentLi.clone();
+							$contentUl.append(cloneLi);
+
+							//移动距离
+							var v_height = $contentLi.outerHeight();
+							$contentUl.height(v_height * $contentUl.find('li').length);
+
+							var i = 0;
+							//下移函数
+							playLeft = function() {
+								if(i > page_count - 2) {
+									i = 0;
+									$contentUl.animate({
+										top: '-=' + v_height
+									}, speed, function() {
+										$contentUl.css('top', '0px');
+									});
+								} else {
+									i++;
+									$contentUl.animate({
+										top: '-=' + v_height
+									}, speed);
+								}
+							}
+							break;
+					}
+					//如果自动切换为true
+					if(autoPlay) {
+						var setTime = setInterval(playLeft, timer);
+						//鼠标移入清空时间函数
+						$content.hover(function() {
+							clearInterval(setTime);
+						}, function() {
+							setTime = setInterval(playLeft, timer);
+						});
+					}
+
+					return this;
+				}
+
+			})(window.jQuery);
+		</script>
+		<script>
+			$(function() {
+				//按透明度的单面切换
+				$(".a").carousel({
+					way: 'fade', //多图片的切换
+					speed: 1000, //切换速度
+					timer: 5000, //切换时间
+					autoPlay: false, //是否自动切换
+					showButton: true, //是否显示底部圆角
+					showArrow: true //是否显示左右箭头
+				});
+
+				//按左右的单面切换
+				$(".b").carousel({
+					way: 'scrollX', //多图片的切换
+					speed: 1000, //切换速度
+					timer: 5000, //切换时间
+					autoPlay: true, //是否自动切换
+					showButton: true, //是否显示底部圆角
+					showArrow: true //是否显示左右箭头
+				});
+
+				//按上下的单面切换
+				$(".c").carousel({
+					way: 'scrollY', //多图片的切换
+					speed: 1000, //切换速度
+					timer: 5000, //切换时间
+					autoPlay: true, //是否自动切换
+					showButton: true, //是否显示底部圆角
+					showArrow: true //是否显示左右箭头
+				});
+
+				//按左右的多图片的切换
+				$(".d").carousel({
+					way: 'scrolls_x', //多图片的切换
+					isLoop: false, //是否一直循环
+					num: 3, //显示图片的个数
+					speed: 1000, //切换速度
+					timer: 5000, //切换时间
+					autoPlay: false, //是否自动切换
+					showButton: false, //是否显示底部圆角
+					showArrow: true //是否显示左右箭头
+				});
+
+				//类似公告的滚动
+				$(".e").carousel({
+					way: 'scrolls_y', //多图片的切换
+					num: 3, //显示图片的个数
+					speed: 1000, //切换速度
+					timer: 5000, //切换时间
+					autoPlay: true //是否自动切换
+				});
+				
+				$('.a .carousel_ul li').imgZoom({
+					//基础属性（必填）
+					basic: {
+						imgOperate: '.nav .img_operate', //图片摆放位置对象
+						imgArea: '.a_1', //图片摆放位置对象
+						img: '.a_1 img', //图片对象
+						isMove: true //图片是否可移动
+					},
+					//操作属性（非必填）
+					operate: {
+						zoom: false, //图片缩放
+						rotate: false //图片旋转
+					}
+					
+				});
+
+			})
+		</script>
+	</head>
+
+	<body>
+
+		<h4>按透明度切换</h4>
+		<div class="a">
+			<ul class="carousel_ul">
+				<li>
+					<div class="a_1">
+						<p><img src="img/1.jpg" width="450" /></p>
+					</div>
+				</li>
+				<li>
+					<a href="#"><img src="img/2.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/3.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/4.jpg"></a>
+				</li>
+			</ul>
+		</div>
+
+		<h4>左右单面切换</h4>
+		<div class="b">
+			<ul class="carousel_ul">
+				<li>
+					<a href="#"><img src="img/1.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/2.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/3.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/4.jpg"></a>
+				</li>
+			</ul>
+		</div>
+
+		<h4>上下单面切换</h4>
+		<div class="c">
+			<ul class="carousel_ul">
+				<li>
+				</li>
+				<li>
+					<a href="#"><img src="img/2.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/3.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/4.jpg"></a>
+				</li>
+			</ul>
+		</div>
+
+		<h4>左右多图片切换</h4>
+		<div class="d">
+			<div class="carousels_div">
+				<ul class="carousel_ul">
+					<li>
+						<a href="#"><img src="img/1.jpg"></a>
+					</li>
+					<li>
+						<a href="#"><img src="img/2.jpg"></a>
+					</li>
+					<li>
+						<a href="#"><img src="img/3.jpg"></a>
+					</li>
+					<li>
+						<a href="#"><img src="img/4.jpg"></a>
+					</li>
+					<li>
+						<a href="#"><img src="img/1.jpg"></a>
+					</li>
+					<li>
+						<a href="#"><img src="img/1.jpg"></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<h4>类似与公告的切换</h4>
+		<div class="e">
+			<ul class="carousel_ul">
+				<li>
+					<a href="#"><img src="img/1.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/2.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/3.jpg"></a>
+				</li>
+				<li>
+					<a href="#"><img src="img/4.jpg"></a>
+				</li>
+			</ul>
+		</div>
+	</body>
+
+</html>

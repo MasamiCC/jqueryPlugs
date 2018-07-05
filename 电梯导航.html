@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			.container {
+				margin: 0 auto;
+				width: 1000px;
+			}
+
+			.container li {
+				height: 400px;
+			}
+			/*电梯区域*/
+
+			.elevator {
+				background: black;
+				color: #ffffff;
+				width: 60px;
+				height: auto;
+			}
+
+			.elevator>a {
+				display: block;
+				line-height: 30px;
+				padding: 0 2px;
+				text-align: center;
+				cursor: pointer;
+			}
+
+			.elevator>a.active {
+				background-color: red;
+			}
+			/*第一种出现方式*/
+
+			.elevator.way1 {
+				position: relative;
+				float: left;
+			}
+
+			.elevator.way1.open {
+				position: fixed;
+				top: 0;
+			}
+			/*第二种出现方式*/
+
+			.elevator.way2 {
+				position: fixed;
+				top: 200px;
+				visibility: hidden;
+				left: 0px;
+				opacity: 0;
+			}
+			
+			.way2.show{
+				animation: show 0.5s ease-in-out;
+				left: 50px;
+				visibility: visible;
+				opacity: 1;
+			}
+			
+			@keyframes show {
+				from {
+					left: 0px;
+					visibility: hidden;
+					opacity: 0;
+				}
+				to {
+					left: 50px;
+					visibility: visible;
+					opacity: 1;
+				}
+			}
+			
+			.way2.hide{
+				animation: hide 0.5s ease-in-out;
+				left: -50px;
+				visibility: hidden;
+				opacity: 0;
+			}
+			
+			@keyframes hide {
+				from {
+					left: 50px;
+					visibility: visible;
+					opacity: 1;
+				}
+				to {
+					left: -50px;
+					visibility: hidden;
+					opacity: 0;
+				}
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/jqueryui/1.10.4/jquery-ui.min.js"></script>
+		<script>
+			(function($) {
+				//电梯导航
+				$.fn.elevator = function(options) {
+					options = $.extend({
+						//电梯区域
+						elevator: $.noop,
+
+						//内容区域
+						content: $.noop,
+
+						//电梯出现的方式
+						showWay: 'way1',
+						
+						//电梯导航出现的高度范围
+						elevatorRegion: [0,0],
+
+						//展示距离的高度
+						showHeight: 0,
+
+						//返回顶部按钮
+						backTop: false,
+
+					}, options);
+
+					//电梯栏本身
+					var $_slef = $(this);
+					//电梯区域
+					var $_elevator = $(options.elevator)
+					//内容区域
+					var $_content = $(options.content);
+					//电梯导航出现的高度范围
+					var	elevatorRegion = options.elevatorRegion;
+					//展示的高度
+					var showHeight = options.showHeight;
+					//出现的方式
+					var showWay = options.showWay;
+					//返回顶部按钮
+					var backTop = options.backTop;
+					//是否开启电梯导航
+					var isOpen = false;
+					//加上电梯的展现形式
+					$_elevator.addClass(showWay);
+					//定义一个存放高度的数组
+					var scrollS = new Array();
+					$.each($_content, function(key, val) {
+						scrollS.push($(val).offset().top - showHeight);
+					});
+
+					//最后一块内容的高度
+					var lastHeight = $_content.last().outerHeight();
+					scrollS.push(lastHeight + $_content.last().offset().top - showHeight);
+
+					//电梯导航出现的最小高度
+					var minHeight = elevatorRegion[0];
+					//电梯导航消失的最大高度
+					var maxHeight = elevatorRegion[1];
+					
+
+					//进行电梯导航的开启
+					var winPos;
+
+					//是否为点击进行的楼层跳转
+					var clickMove = false;
+					//监听浏览器滚动事件
+					$(window).scroll(function(event) {
+						winPos = $(window).scrollTop();
+						//开启导航条事件
+						if(winPos >= minHeight && winPos <= maxHeight && !isOpen) {
+							//选择哪种楼层的出现方式
+							elevatorShow(true);
+							if(!clickMove) {
+								$_elevator.find('.elevator_nai').eq(0).addClass('active');
+							}
+							isOpen = true;
+							//关闭导航条事件
+						} else if((winPos < minHeight || winPos > maxHeight) && isOpen) {
+							//选择哪种楼层的消失方式
+							elevatorShow(false);
+							$_elevator.find('.elevator_nai').removeClass('active');
+							isOpen = false;
+						}
+
+						//如果导航条事件被开启
+						if(isOpen && !clickMove) {
+							var index = compare(scrollS, winPos);
+							$_elevator.find('.elevator_nai').eq(index).addClass('active').siblings('.elevator_nai').removeClass('active');
+						}
+					});
+
+					//定义一个确定位置的函数
+					var compare = function(array, height) {
+						//定义楼层所在的数字
+						var index;
+						for(var i = 0; i < array.length; i++) {
+							if(height >= array[i] && height < array[i + 1]) {
+								index = i;
+								break;
+							} else if(height >= array[array.length - 1]) {
+								index = array.length - 1;
+							}
+						}
+						return index;
+					}
+
+					//定义一个导航条出现的函数
+					var elevatorShow = function(way) {
+						if(way) {
+							//选择哪种楼层的出现方式
+							switch(showWay) {
+								case 'way1':
+									$_elevator.addClass('open');
+									break;
+								case 'way2':
+								  if(!$_elevator.hasClass('show')){
+								  	$_elevator.removeClass('hide');
+								  	$_elevator.addClass('show');
+								  }
+									break;
+							}
+						}else{
+							//选择哪种楼层的消失方式
+							switch(showWay) {
+								case 'way1':
+									$_elevator.removeClass('open');
+									break;
+								case 'way2':
+								  $_elevator.removeClass('show');
+								  $_elevator.addClass('hide');
+									break;
+							}
+						}
+					}
+
+					//楼层被点击
+					$(document).on('click', '.elevator .elevator_nai', function() {
+						clickMove = true;
+						$(this).addClass('active').siblings().removeClass('active');
+						var index = $(this).index();
+						$('html,body').animate({
+							scrollTop: scrollS[index]
+						}, 500, function() {
+							clickMove = false;
+						})
+					});
+
+					//返回顶部按钮
+					if(backTop) {
+						$(document).on('click', '.backTop', function() {
+							$('html,body').animate({
+								scrollTop: 0
+							}, 500)
+						})
+					}
+
+					return this;
+				}
+
+			})(window.jQuery)
+		</script>
+		<script>
+			$(function() {
+				//调用方法
+				$('.elevator_area').elevator({
+					elevator: '.elevator', //电梯区域
+					content: '.container ul li', //内容区域
+				  elevatorRegion: [200,1600], //电梯导航出现的高度范围
+					showHeight: 200, //展示多少高度时出现下个楼层
+					showWay: 'way2', //出现的方式
+					backTop: true //返回顶部按钮
+				});
+			})
+		</script>
+	</head>
+
+	<body>
+
+		<div style="position: relative; margin-top: 500px;" class="elevator_area">
+			<div class="elevator">
+				<a class="elevator_nai">第一个</a>
+				<a class="elevator_nai">第二个</a>
+				<a class="elevator_nai">第三个</a>
+				<a class="elevator_nai">第四个</a>
+				<a class="backTop">返回顶部</a>
+			</div>
+			<div class="container">
+				<ul>
+					<li>111</li>
+					<li>222</li>
+					<li>333</li>
+					<li style="height: 800px;">444</li>
+				</ul>
+			</div>
+		</div>
+
+		<div style="height: 500px;">
+			底部
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>表单提交验证插件</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				font-family: "微软雅黑";
+				color: #323232;
+			}
+			
+			.form_area {
+				width: 100%;
+				overflow: hidden;
+				font-size: 16px;
+			}
+			
+			.required {
+				color: #f12315;
+				margin-right: 5px;
+			}
+			/*失败*/
+			
+			.form_area .public_form.error .info_field .form_text {
+				border: 1px solid #e9574d;
+				color: #e9574d;
+			}
+			
+			.form_area .public_form.error .prompt_message {
+				color: #e9574d;
+			}
+			/*成功*/
+			
+			.form_area .public_form.success .info_field .form_text {
+				border: 1px solid #4bb900;
+				color: #4bb900;
+			}
+			
+			.form_area .public_form.success .prompt_message {
+				color: #4bb900;
+			}
+			/*提交按钮*/
+			
+			.form_area .submit_area {
+				overflow: hidden;
+			}
+			
+			.form_area .submit_area .submit_btn {
+				height: 40px;
+				line-height: 40px;
+				text-align: center;
+				display: inline-block;
+				padding: 0 10px;
+				font-size: 16px;
+				width: 100px;
+				margin-left: 20%;
+				border-radius: 5px;
+				cursor: pointer;
+				background-color: #4bb900;
+				color: #ffffff;
+				border: 0;
+			}
+			/*提交中*/
+			
+			.form_area .submit_area .submit_ing {
+				height: 40px;
+				line-height: 40px;
+				text-align: center;
+				display: inline-block;
+				padding: 0 10px;
+				font-size: 16px;
+				width: 100px;
+				margin-left: 20%;
+				border-radius: 5px;
+				background-color: #4bb900;
+				color: #ffffff;
+				border: 0;
+			}
+			
+			.form_area .submit_area .submit_ing>span {
+				color: #ffffff;
+				display: inline-block;
+				width: 12px;
+				vertical-align: bottom;
+				overflow: hidden;
+				position: relative;
+				top: 2px;
+			}
+			
+			@keyframes dot {
+				0% {
+					width: 0;
+					margin-right: 12px;
+				}
+				33% {
+					width: 4px;
+					margin-right: 8px;
+				}
+				66% {
+					width: 8px;
+					margin-right: 4px;
+				}
+				100% {
+					width: 12px;
+					margin-right: 0;
+				}
+			}
+			
+			.form_area .submit_area .submit_ing>span {
+				animation: dot 3s infinite step-start;
+			}
+			
+			.form_area .btn_area {
+				display: inline-block;
+				margin-right: 5px;
+			}
+			
+			.form_area .btn_area .btn_word {
+				margin-left: 2px;
+				position: relative;
+				top: 2px;
+			}
+			/*单行单列表格*/
+			
+			.single_form .public_form {
+				height: 40px;
+				line-height: 40px;
+				margin-bottom: 15px;
+				display: table;
+				width: 100%;
+			}
+			
+			.single_form .public_form .info_name {
+				width: 20%;
+				text-align: right;
+				padding-right: 20px;
+				display: table-cell;
+				vertical-align: middle;
+			}
+			
+			.single_form .public_form .info_field {
+				width: 60%;
+				text-align: left;
+				display: table-cell;
+			}
+			
+			.single_form .public_form .info_field .form_text {
+				width: 100%;
+				height: 40px;
+				line-height: 40px;
+				border: 1px solid #c7c7c7;
+				padding-left: 15px;
+				display: inline-block;
+				border-radius: 4px;
+			}
+			
+			.single_form .public_form .info_field .form_textarea {
+				display: inline-block;
+				border-radius: 4px;
+				height: auto;
+				line-height: 30px;
+			}
+			
+			.single_form .public_form .prompt_message {
+				display: table-cell;
+				padding-left: 15px;
+				line-height: 20px;
+				font-size: 14px;
+				vertical-align: middle;
+			}
+		</style>
+		<link rel="stylesheet" href="skins/all.css" />
+	</head>
+
+	<body>
+
+		<!--
+      	作者：offline
+      	时间：2017-11-10
+      	描述：表单结构请与我的相同
+      -->
+
+		<!--
+    	描述：单行单列
+    -->
+		<div style="width: 600px;">
+			<h4>单行单列</h4>
+			<form class="form_area single_form" type="get">
+				<!-- 姓名 -->
+				<div class="public_form">
+					<div class="info_name">
+						<label class="required">*</label>姓名
+					</div>
+					<div class="info_field">
+						<input type="text" class="form_text" name="name" placeholder="请输入姓名" />
+					</div>
+					<div class="prompt_message"></div>
+				</div>
+				<div class="public_form">
+					<div class="info_name">
+						<label class="required">*</label>密码
+					</div>
+					<div class="info_field">
+						<input type="password" class="form_text" name="password1" />
+					</div>
+					<div class="prompt_message"></div>
+				</div>
+				<div class="public_form">
+					<div class="info_name">
+						确认密码
+					</div>
+					<div class="info_field">
+						<input type="password" class="form_text" name="password2" />
+					</div>
+					<div class="prompt_message"></div>
+				</div>
+				<div class="public_form">
+					<div class="info_name">
+						邮箱
+					</div>
+					<div class="info_field">
+						<input type="email" class="form_text" name="email" />
+					</div>
+					<div class="prompt_message"></div>
+				</div>
+				<div class="public_form">
+					<div class="info_name">
+						手机号
+					</div>
+					<div class="info_field">
+						<input type="email" class="form_text" name="phone" />
+					</div>
+					<div class="prompt_message"></div>
+				</div>
+				<div class="public_form">
+					<div class="info_name">
+						<label class="required">*</label>年龄
+					</div>
+					<div class="info_field">
+						<select class="form_text">
+							<option></option>
+							<option>0~10</option>
+							<option>10~20</option>
+						</select>
+					</div>
+					<div class="prompt_message"></div>
+				</div>
+				<div class="public_form">
+					<div class="info_name">
+						<label class="required">*</label>描述
+					</div>
+					<div class="info_field">
+						<textarea name="describe" placeholder="不超过100字" class="form_text form_textarea" rows="5"></textarea>
+					</div>
+					<div class="prompt_message"></div>
+				</div>
+				<div class="public_form">
+					<div class="info_name">
+						协议
+					</div>
+					<div class="info_field">
+						<div class="btn_area">
+							<input type="radio" name="协议" /> <span class="btn_word">同意</span>
+						</div>
+						<div class="btn_area">
+							<input type="radio" name="协议" /> <span class="btn_word">不同意</span>
+						</div>
+					</div>
+					<div class="prompt_message"></div>
+				</div>
+				<div class="submit_area">
+					<input type="submit" class="submit_btn" value="提交" />
+
+					<!-- 提交中 -->
+					<!--<div class="submit_ing">
+				  	提交中<span>...</span>
+				  </div>-->
+				</div>
+			</form>
+		</div>
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/icheck.min.js"></script>
+		<script>
+			(function($) {
+				//表单提交及验证
+				//form表单验证函数
+				jQuery.fn.formValid = function() {
+					var text = $(this).find('.form_text');
+					var submitArea = $(this).find(".submit_area");
+					var submit = $(this).find(".submit_btn");
+					var self_ = $(this);
+
+					//得到焦点
+					text.on('focus', function() {
+						focus();
+					});
+
+					//失去焦点事件
+					text.on('blur', function() {
+						confirm(event);
+					});
+
+					//定义一个改变提示信息的jquery方法
+					jQuery.fn.info = function(status, info) {
+						$(this).closest('.public_form').addClass(status);
+						$(this).closest('.public_form').find('.prompt_message').html(info);
+					}
+
+					//文本框重获焦点
+					var focus = function() {
+						var self = $(event.target);
+						self.closest('.public_form').attr('class', 'public_form');
+						self.closest('.public_form').find('.prompt_message').empty();
+					}
+
+					//文本框失去焦点
+					var confirm = function(event) {
+						//兼容ie的设置
+						var evt = window.event || arguments.callee.caller.arguments[0]; // 获取event对象
+
+						//获取各个对象
+						var self = evt.srcElement || evt.target; // 获取触发事件的源对象
+						var val = $.trim($(self).val());
+						var quality = $(self).attr('name');
+						var required = $(self).closest('.public_form').find('.required');
+
+						//进行非空判断
+						var isEmpty = function(val) {
+							if(val === '') {
+								return false
+							} else {
+								return true;
+							}
+						}
+
+						//进行姓名判断
+						var confirmName = function(num1, num2, val) {
+							//校验用户姓名：只能输入4-30个以字母开头的字串
+							var patrn = new RegExp("^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){" + num1 + "," + num2 + "}$");
+							if(patrn.test(val)) {
+								return true;
+							} else {
+								return false
+							}
+						}
+
+						//进行密码判断
+						var confirmPass1 = function(num1, num2, val) {
+							//校验用户密码
+							var patrn = new RegExp("^[a-zA-Z]{1}([a-zA-Z0-9]|[._]){" + num1 + "," + num2 + "}$");
+							if(patrn.test(val)) {
+								return true;
+							} else {
+								return false
+							}
+						}
+
+						//验证第二次密码与第一次输入相同
+						var confirmPass2 = function(val) {
+							//校验密码与第一相同
+							var pass = $("input[name='password1']").val();
+							if(val == pass) {
+								return true;
+							} else {
+								return false
+							}
+						}
+
+						//验证邮箱
+						var confirmEmail = function(val) {
+							//校验邮箱
+							var patrn = /^([0-9A-Za-z\-_\.]+)@([0-9A-Za-z]+\.[A-Za-z]{2,3}(\.[A-Za-z]{2})?)$/g;
+							if(patrn.test(val)) {
+								return true;
+							} else {
+								return false
+							}
+						}
+
+						//验证手机号
+						var confirmPhone = function(val) {
+							//校验用户姓名：只能输入4-30个以字母开头的字串
+							var patrn = /^0?(13[0-9]|15[012356789]|18[0236789]|14[57])[0-9]{8}$/;
+							if(patrn.test(val)) {
+								return true;
+							} else {
+								return false
+							}
+						}
+
+						//验证描述
+						var confirmDescribe = function(val) {
+							//验证描述不超过100
+							var patrn = /^\S{1,100}$/;
+							if(patrn.test(val)) {
+								return true;
+							} else {
+								return false
+							}
+						}
+
+						//进行非空判断
+						if($(required).length > 0) {
+							var flag = isEmpty(val);
+							if(!flag) {
+								//输入框里内容为空时
+								$(self).info('error', '请填入内容哟');
+								return false;
+							}
+						}
+						//正则判断
+						var zz;
+
+						if(val != '') {
+							switch(quality) {
+								//验证姓名
+								case 'name':
+									zz = confirmName(6, 10, val);
+									if(zz) {
+										//姓名匹配
+										$(self).info('success', '下一步');
+									} else {
+										//姓名不匹配
+										$(self).info('error', '请填入5-9个以字母开头的姓名');
+									}
+									break;
+									//验证密码
+								case 'password1':
+									zz = confirmPass1(8, 20, val);
+									if(zz) {
+										//密码匹配
+										$(self).info('success', '下一步');
+									} else {
+										//密码不匹配
+										$(self).info('error', '请填入8-20以字母开头的密码');
+									}
+									break;
+
+									//验证第二次密码与第一次输入相同
+								case 'password2':
+									zz = confirmPass2(val);
+									if(zz) {
+										//密码匹配
+										$(self).info('success', '密码相同');
+									} else {
+										//密码与第一次不匹配
+										$(self).info('error', '请填入与上一步相同的密码');
+									}
+									break;
+
+									//验证邮箱格式
+								case 'email':
+									zz = confirmEmail(val);
+									if(zz) {
+										//邮箱格式匹配
+										$(self).info('success', '下一步');
+									} else {
+										//邮箱格式不匹配
+										$(self).info('error', '请填入正确的邮箱格式');
+									}
+									break;
+									//验证手机号
+								case 'phone':
+									zz = confirmPhone(val);
+									if(zz) {
+										//邮箱格式匹配
+										$(self).info('success', '下一步');
+									} else {
+										//邮箱格式不匹配
+										$(self).info('error', '请填入正确的手机号');
+									}
+									break;
+									//验证描述不超过100
+								case 'describe':
+									zz = confirmDescribe(val);
+									if(zz) {
+										//邮箱格式匹配
+										$(self).info('success', '下一步');
+									} else {
+										//邮箱格式不匹配
+										$(self).info('error', '描述不超过100字');
+									}
+									break;
+								default:
+									$(self).info('success', '下一步');
+							}
+						}
+					}
+
+					//表单内的提交按钮点击时
+					submit.on('click', function() {
+						//判断必填表单有无内容
+						var sub = true;
+						var required_text = self_.find('.required').closest('.public_form').find('.form_text');
+						$.each(required_text, function(i, val) {
+							if($(val).val() === '') {
+								$(val).info('error', '请填入内容哟');
+								sub = false;
+							}
+						});
+
+						var err = self_.find('.error').length;
+						if(err > 0) {
+							sub = false;
+						}
+
+						if(sub) {
+							submitArea.empty();
+							var submitIng = $("<div class='submit_ing'>提交中<span>...</span></div>")
+							submitArea.html(submitIng);
+
+							return true;
+						} else {
+							return false;
+						}
+					})
+					return this;
+				}
+			})(window.jQuery);
+		</script>
+		<script>
+			//调用form表单函数
+			$('.form_area').formValid();
+
+			//icheck函数
+			$('input').iCheck({
+				labelHover: true,
+				cursor: true,
+				checkboxClass: 'icheckbox_square-blue',
+				radioClass: 'iradio_square-blue',
+				increaseArea: '20%'
+			});
+		</script>
+	</body>
+
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>简单的tab插件</title>
+		<style>
+			body{
+				height: 2000px;
+			}
+			.nav {
+				width: 500px;
+				height: 500px;
+				overflow: hidden;
+				border: 1px solid aquamarine;
+			}
+			
+			.nav .img_operate {
+				height: 30px;
+				line-height: 30px;
+			}
+			
+			.nav .a {
+				width: 100%;
+				height: 100%;
+				position: relative;
+				overflow: hidden;
+			}
+			
+			.nav .a p {
+				position: absolute;
+				top: 0px;
+				left: 0px;
+				width: 100%;
+				height: 100%;
+			}
+			
+			.nav .a p>img {
+				height: auto;
+				transition: all 0.7s ease-out;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			//jquery新增方法
+			;
+			(function($, window, document, undefined) {
+
+				//定义一个构造函数
+				var ImgZoom = function(ele, opt) {
+					//定义一个原始对象
+					this.$element = ele,
+					
+					//默认图片大小比例
+					this.zoom = 1,
+					
+					//默认图片旋转方向
+					this.roate = 0,
+					
+					//默认数值
+					this.defaults = {
+						//基础属性
+						basic: {
+							//图片摆放位置对象
+							'imgArea': $.noop,
+							//图片对象
+							'img': $.noop,
+							//图片是否可移动
+							'isMove': false,
+						},
+						operate: {
+							//缩放功能
+							'zoom' : false,
+							//旋转功能
+							'rotate': false,
+						}
+					},
+					this.options = $.extend({}, this.defaults, opt)
+				}
+
+				ImgZoom.prototype = {
+					
+					//定义一个确定图片css的方法
+					imgCss: function(){
+						$(this.options.basic.img).css({
+							"transform": "scale(" + this.zoom + ")" + "rotate("+ this.roate +"deg)",
+						});
+					},
+
+					//定义一个图片放大的方法
+					enlarge: function() {
+						this.zoom +=.1;
+						this.imgCss();
+					},
+					
+					//定义一个图片缩小的方法
+					shrink: function(){
+						if(this.zoom > .2){
+							this.zoom -=.1;
+						}
+						this.imgCss();
+					},
+					
+					//定义一个鼠标滚轮滚动
+					wheel: function(e){
+						e = e || window.event;
+						if(e.wheelDelta) { //IE/Opera/Chrome 
+							var distance = e.wheelDelta;
+							if(distance > 0){
+								this.shrink();
+							}else{
+								this.enlarge();
+							}
+						} else if(e.detail) { //Firefox 
+							t2.value = e.detail;
+						}
+					},
+					
+					//定义一个图片左旋
+					rotateLeft: function(){
+					  this.roate += 45;
+					  this.imgCss();
+					},
+					
+					//定义一个图片右旋
+					rotateRight: function(){
+					  this.roate -= 45;
+					  this.imgCss();
+					}
+				}
+
+				//在插件中使用这个对象
+				$.fn.imgZoom = function(options) {
+					//创建Beautifier的实体
+					var imgZoom = new ImgZoom(this, options);
+
+					//选取的对象class
+					var selector = imgZoom.$element.selector;
+					
+					//图片是否允许移动
+					if(imgZoom.options.basic.isMove) {
+						//绑定鼠标左键按下事件
+						$(imgZoom.options.basic.imgArea + ' p').bind('mousedown', function(event) {
+								event.preventDefault && event.preventDefault();
+								var offset_x = $(this)[0].offsetLeft; //x坐标
+								var offset_y = $(this)[0].offsetTop; //y坐标
+								//获取当前鼠标的坐标
+								var mouse_x = event.pageX;
+								var mouse_y = event.pageY;
+								//绑定拖动事件
+								$(imgZoom.options.basic.imgArea).bind("mousemove", function(ev) {
+									// 计算鼠标移动了的位置
+									var _x = ev.pageX - mouse_x;
+									var _y = ev.pageY - mouse_y;
+
+									//设置移动后的元素坐标
+									var now_x = (offset_x + _x) + "px";
+									var now_y = (offset_y + _y) + "px";
+
+									//改变目标元素的位置
+									$(imgZoom.options.basic.imgArea + ' p').css({
+										top: now_y,
+										left: now_x
+									});
+								})
+
+							});
+
+							//当鼠标左键松开，接触事件绑定
+							$(imgZoom.options.basic.imgArea).bind("mouseup", function() {
+								$(this).unbind("mousemove");
+							});
+					};
+					
+					//图片的操作
+					
+					//图片放大缩小
+					if(imgZoom.options.operate.zoom){
+						$(imgZoom.options.basic.imgOperate).append("<span class='enlarge'>放大</span><span class='shrink'>缩小</span>");
+						
+						//放大按钮被点击
+						$(document).on('click',selector+' .enlarge',function(){
+							imgZoom.enlarge();
+						});
+						
+						//缩小按钮被点击
+						$(document).on('click',selector+' .shrink',function(){
+							imgZoom.shrink();
+						});
+						
+						$(imgZoom.options.basic.imgArea).hover(function(){
+							$(document).bind('mousewheel', function(event, delta) { return false; });
+						})
+						
+						//鼠标滚轮事件
+						$(document).on('mousewheel',imgZoom.options.basic.imgArea,function(e){
+							imgZoom.wheel();
+						})
+						
+					};
+					
+					//图片的旋转
+					if(imgZoom.options.operate.rotate){
+						$(imgZoom.options.basic.imgOperate).append("<span class='rotate_left'>左旋</span><span class='rotate_right'>右旋</span>");
+						
+						//左旋按钮被点击
+						$(document).on('click',selector+' .rotate_left',function(){
+							imgZoom.rotateLeft();
+						});
+						
+						//鼠标滚轮事件
+						$(document).on('click',selector+' .rotate_right',function(e){
+							imgZoom.rotateRight();
+						})
+					}
+					
+
+				}
+			})(jQuery, window, document);
+		</script>
+		<script>
+			$(function() {
+				$('.nav ').imgZoom({
+					//基础属性（必填）
+					basic: {
+						imgOperate: '.nav .img_operate', //图片摆放位置对象
+						imgArea: '.nav .a', //图片摆放位置对象
+						img: '.nav .a img', //图片对象
+						isMove: true //图片是否可移动
+					},
+					//操作属性（非必填）
+					operate: {
+						zoom: true, //图片缩放
+						rotate: true //图片旋转
+					}
+					
+				});
+			})
+		</script>
+	</head>
+
+	<body>
+		<div class="nav">
+			<div class="img_operate">
+			</div>
+			<div class="a">
+				<p><img src="img/2.jpg" width="450" /></p>
+			</div>
+		</div>
+
+	</body>
+
+</html>

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>后台布局</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			/*公共样式*/
+			
+			.my_layout {
+				overflow: hidden;
+			}
+			
+			.my_layout_header {
+				position: relative;
+				z-index: 9;
+			}
+			
+			.my_layout_left {
+				position: fixed;
+				top: 80px;
+				bottom: 0;
+				z-index: 8;
+				overflow-x: hidden;
+			}
+			
+			.my_layout_body {
+				padding: 10px;
+				position: absolute;
+				left: 0;
+				right: 0;
+				top: 0;
+				bottom: 0;
+				z-index: 5;
+				width: auto;
+				overflow: hidden;
+				overflow-y: auto;
+			}
+			/*以下是可以自己调整的css*/
+			
+			.a {
+				overflow: hidden;
+			}
+			
+			.a .my_layout_header {
+				height: 80px;
+				background-color: red;
+			}
+			
+			.a .my_layout_left {
+				width: 200px;
+				background-color: blue;
+			}
+			
+			.a .my_layout_body {
+				left: 200px;
+				top: 80px;
+			}
+			/*
+			 * 左侧伸缩菜单
+			 */
+			
+			.layout_item {
+				position: relative;
+				display: block;
+				vertical-align: middle;
+			}
+			
+			.layout_item_title {
+				display: block;
+				height: 40px;
+				line-height: 40px;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+				padding: 0 20px;
+				position: relative;
+				cursor: pointer;
+			}
+			/*更多*/
+			
+			.layout-more {
+				top: 50%;
+				right: 10px;
+				margin: 0;
+				content: '';
+				width: 0;
+				height: 0;
+				border-style: solid dashed dashed;
+				border-color: #fff transparent transparent;
+				overflow: hidden;
+				cursor: pointer;
+				transition: all .2s;
+				-webkit-transition: all .2s;
+				position: absolute;
+				margin-top: -3px;
+				border-width: 6px;
+				border-top-color: rgba(255, 255, 255, .7);
+			}
+			
+			.layout_itemed .layout-more {
+				margin-top: -12px;
+				border-style: dashed dashed solid;
+				border-color: transparent transparent #fff;
+			}
+			/*下方展示区*/
+			
+			.layout_item_content {
+				display: none;
+			}
+			
+			.item_content_a {
+				display: block;
+				padding: 0 20px;
+				height: 40px;
+				line-height: 40px;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+			/*
+			 * 自己定义的select插件样式
+			 */
+			
+			.select_area {
+				width: 500px;
+				position: relative;
+				height: 50px;
+				cursor: pointer;
+				float: left;
+			}
+			
+			.select {
+				width: 100%;
+				height: 50px;
+				line-height: 50px;
+			}
+			/*select区域*/
+			
+			.selectric {
+				width: 100%;
+				height: 50px;
+				line-height: 50px;
+				border: 1px solid #DDD;
+				border-radius: 0px;
+				background: #FFFFFF;
+				position: relative;
+				overflow: hidden;
+				padding: 0 15px;
+			}
+			
+			.selectric:hover {
+				border: 1px solid #c4c4c4;
+			}
+			
+			.selectric:hover b {
+				color: #a2a2a2;
+			}
+			
+			.selectric .selectric_span {
+				display: block;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				font-size: 14px;
+				color: #444;
+				-webkit-user-select: none;
+				-moz-user-select: none;
+				-ms-user-select: none;
+			}
+			
+			.selectric>b {
+				display: block;
+				position: absolute;
+				right: 0;
+				top: 0;
+				width: 50px;
+				height: 50px;
+				line-height: 50px;
+				color: #BBB;
+				text-align: center;
+			}
+			/*option区域*/
+			
+			.selectric-items {
+				position: absolute;
+				top: 100%;
+				left: 0;
+				width: 100%;
+				overflow-y: auto;
+				background: #FFFFFF;
+				border: 1px solid #c4c4c4;
+				border-top: 0;
+				z-index: -1;
+				box-shadow: 0 0 10px -6px;
+				visibility: hidden;
+				z-index: 9;
+			}
+			/*option内容摆放区*/
+			
+			.selectric-scroll {
+				width: 100%;
+				max-height: 250px;
+				overflow-y: auto;
+				background: #FFFFFF;
+			}
+			
+			.selectric-items ul>li {
+				height: 50px;
+				line-height: 50px;
+				padding: 0 15px;
+				cursor: pointer;
+			}
+			
+			.selectric-items ul>li.active {
+				background-color: #D0D0D0;
+			}
+			
+			.selectric-items ul>li:hover {
+				background-color: #D0D0D0;
+			}
+			/*搜索框*/
+			
+			.selectric_field {
+				height: 50px;
+				line-height: 50px;
+				padding-left: 15px;
+				border-bottom: 1px solid #C7C7C7;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/myJs.js"></script>
+		<script>
+			$(function() {
+				//调用方法
+				$('select').selectric();
+			})
+		</script>
+	</head>
+
+	<body class="my_layout">
+
+		<!--
+        	作者：offline
+        	时间：2017-12-12
+        	描述：我的后台布局，请按照我的方法来命名class,style里的内容可以仁义替换
+        -->
+		<div class="a">
+			<!--头部-->
+			<div class="my_layout_header"></div>
+
+			<!--左侧-->
+			<div class="my_layout_left">
+				<div class="b">
+					<!--伸缩菜单-->
+					<ul class="layout_scroll_ul">
+						<li class="layout_item">
+							<a class="layout_item_title">
+								语文
+								<span class="layout-more"></span>
+							</a>
+							<div class="layout_item_content">
+								<a class="item_content_a">
+									111
+								</a>
+								<a class="item_content_a">
+									222
+								</a>
+								<a class="item_content_a">
+									333
+								</a>
+							</div>
+						</li>
+						<li class="layout_item">
+							<a class="layout_item_title">
+								数学
+								<span class="layout-more"></span>
+							</a>
+							<div class="layout_item_content">
+								<a class="item_content_a">
+									111
+								</a>
+								<a class="item_content_a">
+									222
+								</a>
+								<a class="item_content_a">
+									333
+								</a>
+							</div>
+						</li>
+						<li class="layout_item"></li>
+						<li class="layout_item"></li>
+					</ul>
+				</div>
+			</div>
+
+			<!--主体-->
+			<div class="my_layout_body">
+			</div>
+		</div>
+	</body>
+
+</html>

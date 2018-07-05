@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>3d轮播</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			.carousel {
+				position: relative;
+				width: 840px;
+				margin: 0 auto;
+			}
+			
+			.carousel .img {
+				overflow: hidden;
+				position: absolute;
+				transition: width 0.4s, height 0.4s, top 0.4s, left 0.4s, z-index 0.4s;
+			}
+			
+			.carousel .img>img {
+				width: 100%;
+				height: auto;
+			}
+			
+			.slide .img1 {
+				width: 0px;
+				height: 0px;
+				top: 30%;
+				left: -50%;
+				z-index: 1;
+			}
+			
+			.slide .img2 {
+				width: 500px;
+				height: 200px;
+				top: 20%;
+				left: -20%;
+				z-index: 2;
+			}
+			
+			.slide .img3 {
+				width: 520px;
+				height: auto;
+				top: 10%;
+				left: 20%;
+				z-index: 3;
+			}
+			
+			.slide .img4 {
+				width: 500px;
+				height: 200px;
+				top: 20%;
+				left: 60%;
+				z-index: 2;
+			}
+			
+			.slide .img5 {
+				width: 0px;
+				height: 0px;
+				top: 30%;
+				left: 110%;
+				z-index: 1;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			$(function() {
+				var imgNub = $(".carousel .img").size();
+				//获取轮播图片数量
+				for(i = 0; i < imgNub; i++) {
+					$(".carousel .img:eq(" + i + ")").attr("imgId", i);
+				}
+
+				if(imgNub > 3 && imgNub < 6) { //img 1、2、3、4、(5)
+					for(i = 0; i < imgNub; i++) {
+						$(".carousel .img:eq(" + i + ")").addClass("img" + (i + 1));
+					}
+				}
+
+				function right() {
+					var fy = []; //我们需要将原来的每个位置class。依序放到数组里。
+					for(i = 0; i < imgNub; i++) { //imgId最初设置的时候是0-X。取出相应位置class的时候自然也是有序的
+						var className=$(".carousel .img[imgId=" + i + "]").attr("class");
+					  fy.push(className);
+					}
+					for(i = 0; i < imgNub; i++) {
+						if(i == 0) { //将最左边图移动到最右边、实现轮播。0->5
+							$(".carousel .img[imgId=" + i + "]").attr("class", fy[imgNub - 1]);
+						} else { //其他依次后(左)移:1->0 2->1....
+							$(".carousel .img[imgId=" + i + "]").attr("class", fy[i - 1]);
+						}
+					}
+				}
+				
+				$('.right').click(function(){
+					right(); 
+				})
+
+			})
+		</script>
+	</head>
+
+	<body>
+		<div class="carousel slide">
+			<!-- 轮播图片数量可变 -->
+			<div class="img">
+				<img src="img/1.jpg" />
+			</div>
+			<div class="img">
+				<img src="img/2.jpg" />
+			</div>
+			<div class="img">
+				<img src="img/3.jpg" />
+			</div>
+			<div class="img">
+				<img src="img/4.jpg" />
+			</div>
+			<div class="img">
+				<img src="img/4.jpg" />
+			</div>
+		</div>
+		
+		<button class="right">向右</button>
+	</body>
+
+</html>

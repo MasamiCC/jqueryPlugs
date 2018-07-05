@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			ul,
+			li {
+				list-style: none;
+			}
+			/*在这里设置样式哦*/
+			/*主体样式*/
+			/*按透明度切换*/
+			
+			.a,
+			.b,
+			.c,
+			.d,
+			.e {
+				position: relative;
+				width: 550px;
+				height: 340px;
+				overflow: hidden;
+			}
+			
+			.b {
+				padding: 20px;
+			}
+			/*
+			 * 这些是必须加上的哟
+			 */
+			/*这些你可以自己改动，如果你会的话*/
+			/*轮播区域*/
+			
+			.carousel_area {
+				position: relative;
+				width: 100%;
+				height: 100%;
+				overflow: hidden;
+			}
+			/*公共下圆角*/
+			
+			.position_ul {
+				height: 35px;
+				line-height: 35px;
+				padding-right: 15px;
+				position: absolute;
+				bottom: 0;
+				right: 0;
+				margin: 0;
+				width: 100%;
+				background-color: rgba(0, 0, 0, 0.4);
+				text-align: right;
+			}
+			
+			.position_ul li {
+				display: inline-block;
+				margin-top: 15px;
+				cursor: pointer;
+				width: 10px;
+				height: 10px;
+				-moz-border-radius: 5px;
+				-webkit-border-radius: 5px;
+				border-radius: 5px;
+				background: #333;
+				margin-right: 5px;
+				background-color: #FFFFFF;
+			}
+			
+			.position_ul li.cur {
+				background: #C70128;
+			}
+			/*公共左右箭头*/
+			
+			.prev,
+			.next {
+				position: absolute;
+				top: 40%;
+				display: block;
+				width: 20px;
+				height: 30px;
+				z-index: 2;
+				cursor: pointer;
+				background-color: red;
+			}
+			
+			.prev {
+				left: 0;
+			}
+			
+			.next {
+				right: 0;
+			}
+			
+			.prev.stop,
+			.next.stop {
+				background-color: black;
+			}
+			/*依靠透明度变化*/
+			
+			.carousel_area .carousel_ul.fade li {
+				display: none;
+			}
+			
+			.carousel_area .carousel_ul.fade li:first-child {
+				display: list-item;
+			}
+			
+			.carousel_ul.fade>li {
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+			}
+			/*图片高度自适应*/
+			
+			.carousel_ul.fade img {
+				width: 100%;
+				height: 100%;
+			}
+			/*一面显示多图片左右切换*/
+			
+			.carousel_ul.scroll_x {
+				position: absolute;
+				top: 0;
+				left: 0;
+				height: 100%;
+			}
+			
+			.carousel_ul.scroll_x>li {
+				height: 100%;
+				padding: 10px;
+				float: left;
+			}
+			
+			.carousel_ul.scroll_x>li img {
+				width: 100%;
+				height: 100%;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			/*
+			 * 图片轮播插件
+			 */
+			//jquery新增方法
+			;
+			(function($, window, document, undefined) {
+				var Carousel = function(ele, opt) {
+					//对象本身
+					this.$element = ele,
+
+					//设置一个基本值
+					this.i = 0;
+					
+					//设置一个方向
+					this.direction = 'next';
+
+					//获取页面元素
+					this.$carouselArea = this.$element.find('.carousel_area'),
+					this.$contentUl = this.$element.find('.carousel_ul'),
+					this.$contentLi = this.$contentUl.children('li'),
+					this.page_count = this.$contentLi.length,
+
+					//默认参数
+					this.defaults = {
+						basic: {
+							//轮播方式
+							'way': 'fade',
+
+							//滚动速度（默认为100）
+							'speed': 100,
+
+							//滚动间隔时间（默认为100）
+							'timer': 100,
+
+							//是否显示下圆角（默认为false）
+							'showButton': false,
+
+							//是否显示左右箭头（默认为false）
+							'showArrow': false,
+
+							//是否自动播放（默认为false）
+							'autoPlay': false,
+						},
+
+						extra: {
+							//显示数量
+							'showNum': 0,
+							//是否一直循环
+							'isLoop': false,
+						  //ajax点击数据加载
+						  'clickAjax': $.noop,
+
+						}
+					},
+
+					this.options = $.extend({}, this.defaults, opt);
+				}
+
+				Carousel.prototype = {
+					//定义该对象的方法
+
+					//得到需要移动的宽度
+					getWidth: function() {
+						var num = this.options.extra.showNum;
+						var liWidth = this.$carouselArea.outerWidth() / this.options.extra.showNum;
+						this.$contentLi.outerWidth(liWidth);
+						this.$contentUl.outerWidth(liWidth * this.page_count)
+						if(this.options.extra.isLoop) {
+
+						}
+						return liWidth;
+					},
+
+					//下圆角函数
+					showButton: function() {
+						var $positionUl = $("<ul class='position_ul'></ul>");
+						for(var i = 1; i <= this.page_count; i++) {
+							if(i == 1) {
+								$positionUl.append("<li class='cur'></li>");
+							} else {
+								$positionUl.append("<li></li>");
+							}
+						}
+
+						this.$carouselArea.append($positionUl);
+					},
+
+					//左右箭头函数
+					showArrow: function() {
+						var $prev = $("<span class='prev arrow'></span>");
+						var $next = $("<span class='next arrow'></span>");
+						this.$element.append($prev);
+						this.$element.append($next);
+					},
+					
+					
+					//克隆新的li
+					cloneLi: function(liWidth){
+						var lis = this.$contentLi.clone();
+						this.$contentUl.append(lis);
+						lis = this.$contentLi.clone();
+						this.$contentUl.append(lis);
+						this.$contentUl.css('left',-liWidth*4+'px')
+						this.page_count = this.$contentUl.children('li').length;
+					},
+
+					//playNext下一步
+					playNext: function(liWidth) {
+						var page_count = this.page_count/2;
+						this.i++;
+						//定义一个i的变量
+						this.$contentUl.animate({
+							left: '-=' + liWidth
+						}, this.options.basic.speed, function() {
+							if(this.i == page_count ) {
+								this.i = 0;
+								this.$contentUl.css('left','0');
+							}
+						}.bind(this));
+					},
+
+					//playPrev上一步
+					playPrev: function(liWidth) {
+						var page_count = this.page_count/2;
+						this.i--;
+						//定义一个i的变量
+						this.$contentUl.animate({
+							left: '+=' + liWidth
+						}, this.options.basic.speed, function() {
+							if(this.i == -4 ) {
+								this.i = page_count;
+								this.$contentUl.css('left','-2040px');
+							}
+						}.bind(this));
+					},
+					
+					//速度向右
+					playSpeedNext: function(){
+						if(this.direction=="next"){
+							this.options.basic.timer = this.options.basic.timer -1000;
+						}else{
+							this.direction = "next";
+							this.options.basic.timer = 5000;
+						}
+					},
+					
+					//速度向左
+					playSpeedPrev: function(direction){
+						if(this.direction=="next"){
+							this.direction = "prev";
+								this.options.basic.timer = 5000;
+						}else{
+							this.options.basic.timer = this.options.basic.timer -1000;
+						}
+					}
+					
+					
+					
+				}
+
+				//在插件中使用这个对象
+				$.fn.carousel = function(options) {
+					//创建Carousel的实体
+					var carousel = new Carousel(this, options);
+
+					//获取页面元素
+					var $content = carousel.$element;
+					var $carousel = carousel.$carouselArea;
+					var $contentUl = carousel.$contentUl;
+					var $contentLi = carousel.$contentLi;
+					var page_count = carousel.page_count;
+					var selector = carousel.$element.selector;
+
+					//多图片显示时，每次移动的距离
+					var liWidth;
+					
+					//加上独有的class
+					$contentUl.addClass(carousel.options.basic.way);
+
+					//设置切换多图片的图片宽度
+					if(carousel.options.extra.showNum > 0) {
+						liWidth = carousel.getWidth();
+					}
+
+					//如果显示下圆角为true
+					if(carousel.options.basic.showButton) {
+						carousel.showButton();
+						//鼠标移入事件
+						var time;
+						var _this
+						$(selector + ' .position_ul li').hover(function() {
+							_this = this;
+							time = setTimeout(function() {
+								carousel.mouseOver(_this);
+							}, 100);
+						}, function() {
+							if(time) {
+								clearTimeout(time);
+							}
+						});
+					}
+
+					//如果显示左右箭头为true
+					if(carousel.options.basic.showArrow) {
+						carousel.showArrow();
+						//下一张图片
+						var id = 0;
+						$(document).on('click', selector + ' .next', function() {
+								carousel.playSpeedNext();
+						});
+
+						//上一张图片
+						$(document).on('click', selector + ' .prev', function() {
+								carousel.playSpeedPrev();
+						});
+					}
+					
+					//如果需要自动切换且一直循环
+					if(carousel.options.extra.isLoop){
+						//克隆一个新的
+						carousel.cloneLi(liWidth);
+						//重新计算宽度
+						liWidth = carousel.getWidth();
+						
+						var setTime = setInterval(function() {
+							if(carousel.direction =="next"){
+								carousel.playNext(liWidth);
+							}else{
+								carousel.playPrev(liWidth);
+							}
+							}, carousel.options.basic.timer);
+					}
+					
+
+				}
+
+			})(jQuery, window, document);
+		</script>
+
+		<script>
+			$(function() {
+				$(".b").carousel({
+					//基础属性
+					basic: {
+						way: 'scroll_x', //切换方式
+						speed: 500, //切换速度
+						timer: 500, //切换时间
+						autoPlay: false, //是否自动切换
+						showButton: false, //是否显示底部圆角
+						showArrow: true //是否显示左右箭头
+					},
+					//额外属性
+					extra: {
+						showNum: 1, //一页展示的数量
+						isLoop: true //是否一直循环
+					}
+				});
+			})
+		</script>
+	</head>
+
+	<body>
+
+
+		<h4 style="margin-top: 50px;">左右切换多图片</h4>
+		<div class="b">
+			<div class="carousel_area">
+				<ul class="carousel_ul">
+					<li>
+						<a href="#"><img src="img/1.jpg"></a>
+					</li>
+					<li>
+						<a href="#"><img src="img/2.jpg"></a>
+					</li>
+					<li>
+						<a href="#"><img src="img/3.jpg"></a>
+					</li>
+					<li>
+						<a href="#"><img src="img/4.jpg"></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+
+</html>

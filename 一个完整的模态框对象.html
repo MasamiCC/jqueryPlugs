@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>模态框</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			.modle_open {
+				overflow: hidden;
+				padding-right: 17px;
+			}
+			
+			.modle {
+				position: fixed;
+				z-index: 5;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+			}
+			
+			.modle_bg {
+				width: 100%;
+				height: 100%;
+				background-color: #000;
+				opacity: 0.3;
+				-webkit-opacity: 0.3;
+				-khtml-opacity: 0.3;
+				-moz-opacity: 0.3;
+				filter: Alpha(opacity=30);
+				z-index: 5;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+			
+			.modle_content {
+				padding: 20px;
+				background-color: #FFFFFF;
+				z-index: 8;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+			}
+			
+			.modle.way2 .modle_content {
+				margin-top: 30px;
+				-webkit-transition: -webkit-transform .3s ease-out;
+				-o-transition: -o-transform .3s ease-out;
+				transition: transform .3s ease-out;
+				-webkit-transform: translate(0, -25%);
+				-ms-transform: translate(0, -25%);
+				-o-transform: translate(0, -25%);
+				transform: translate(0, -25%);
+			}
+			
+			.way2.in .modle_content {
+				-webkit-transform: translate(0, 0);
+				-ms-transform: translate(0, 0);
+				-o-transform: translate(0, 0);
+				transform: translate(0, 0);
+			}
+			/*关闭按钮（可以自己调整样式哦）*/
+			
+			.modle_close {
+				display: block;
+				width: 50px;
+				height: 50px;
+				background-color: red;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+
+	<body>
+		-
+		<!--
+			作者：offline
+			时间：2017-11-24
+			描述：模态框
+		-->
+		<button class="modle_button">
+			点击即可出现模态框
+		</button>
+
+		<div class="modle way2" id='mod' style="display: none;">
+			<div class="modle_bg">
+
+			</div>
+
+			<div class="modle_content">
+				<a class="modle_close">
+
+				</a>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			(function($) {
+
+				$.Modle = function(ele,opt) {
+					
+					this.$element = ele,
+
+					//该对象的结构
+					this.structure = $("<div class='modle'>" +
+							"<div class='modle_bg'>" +
+							"</div>" +
+							"<div class='modle_content'>" +
+							"<div class='modle_close'>" + "</div>" +
+							"<div class='content'>" + "</div>" +
+							"</div>" +
+							"</div>"), //这个是私有变量，外部无法访问
+
+						this.defaults = {
+							'contentId': ''
+						},
+						this.options = $.extend({}, this.defaults, opt)
+				};
+				
+				$(document).on('click','.modle_close',function(){
+					
+				})
+				
+
+				$.Modle.prototype = {
+					//新增一个方法
+					//show方法
+					show: function(a) {
+						$('body').addClass('modle_open');
+						//判断是自己生成还是原本就有
+						if(this.options.contentId == '') {
+							$('body').append(this.structure);
+							this.structure.find('.content').append(a);
+							var $_modleContent = this.structure.find('.modle_content');
+							var modle_content_width = $_modleContent.outerWidth();
+							var modle_content_height = $_modleContent.outerHeight();
+							$_modleContent.css({
+								"margin-left": -modle_content_width / 2 + 'px',
+								"margin-top": -modle_content_height / 2 + 'px',
+							});
+						} else {
+							$(this.options.contentId).show();
+						}
+					},
+					//hide方法
+					hide: function() {
+						$('body').removeClass('modle_open');
+						//判断是自己生成还是原本就有
+						if(this.options.contentId == '') {
+							this.structure.find('.content').empty();
+							this.structure.remove();
+						} else {
+							$(this.options.contentId).hide();
+						}
+					}
+				}
+
+			})(jQuery);
+		</script>
+		<script>
+			var a = new $.Modle(this);
+
+			$('.modle_button').click(function(){
+				a.show();
+			})
+			
+		</script>
+
+	</body>
+
+</html>

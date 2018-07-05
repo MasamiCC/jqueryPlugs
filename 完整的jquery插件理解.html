@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			//this的理解
+			//			$.fn.myPlugin_1 = function() {
+			//		    this.css('color', 'red');
+			//			}
+			//			$(function(){
+			//				$('a').myPlugin_1();
+			//			})；
+
+			//多参数的上传
+			//			$.fn.myPlugin_2 = function(options) {
+			//		    var defaults = {
+			//	        num1:{
+			//	        	'color': 'red',
+			//			    	'fontSize': '14px'
+			//	        },
+			//	        num2:{
+			//	        	'background': 'black'
+			//	        }
+			//		    };
+			//		     defaults.num1 = $.extend(defaults.num1, options.num1);
+			//		     defaults.num2 = $.extend(defaults.num2, options.num2);
+			//		    return this.css({
+			//	        'color': defaults.num1.color,
+			//	        'fontSize': defaults.num1.fontSize,
+			//	        'background': defaults.num2.background,
+			//		    });
+			//			}
+			//			
+			//			$(function(){
+			//				$('a').myPlugin_2({
+			//			    num1:{
+			////			    	'color': 'green',
+			//			    	'fontSize': '18px'
+			//			    },
+			//			    num2:{
+			////			    	'background': 'red'
+			//			    }
+			//				});
+			//			});	
+
+			//面向对象的插件开发
+			;(function($, window, document, undefined) {
+				//定义Beautifier的构造函数
+				var Beautifier = function(ele, opt) {
+					this.$element = ele,
+					this.defaults = {
+						'color': 'red',
+						'fontSize': '12px',
+						'textDecoration': 'none'
+					},
+					this.options = $.extend({}, this.defaults, opt)
+				}
+				//定义Beautifier的方法
+				Beautifier.prototype = {
+					//第一个方法
+					beautify: function() {
+						return this.$element.css({
+							'color': this.options.color,
+							'fontSize': this.options.fontSize,
+							'textDecoration': this.options.textDecoration
+						});
+					},
+					
+					//第二个方法
+					waysTwo: function(){
+						alert(11);
+					}
+				}
+
+				//在插件中使用Beautifier对象
+				$.fn.myPlugin = function(options) {
+					//创建Beautifier的实体
+					var beautifier = new Beautifier(this, options);
+					//调用其方法
+					beautifier.beautify();
+					beautifier.waysTwo();
+				}
+			})(jQuery, window, document);
+
+			$(function() {
+				$('a').myPlugin({
+					'color': '#2C9929',
+					'fontSize': '20px'
+				});
+			})
+		</script>
+	</head>
+
+	<body>
+		<a>11</a>
+		<a>22</a>
+	</body>
+
+</html>

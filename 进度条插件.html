@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			.a ,.b{
+				width: 1000px;
+				height: 50px;
+		    align-items:Center;
+		    display: flex;
+			}
+			
+			/*进度条外部包裹*/
+			.progress_bar{
+				padding: 10px 0;
+				overflow: hidden;
+				position: relative;
+			}
+			
+			.progress{
+				height: 100%;
+				width: 0;
+			}
+			
+			.percent_show{
+				position: absolute;
+				top: 0;
+				right: 0;
+				height: 100%;
+				width: 50px;
+				background-color: blueviolet;
+				text-align: center;
+				line-height: 30px;
+				color: #ffffff;
+			}
+			
+			/*你可以自己配置进度条的各种样式哟*/
+			.c1{
+				height: 30px;
+			}
+			
+			.c1 .progress{
+				background-color: greenyellow;
+			}
+			
+			.button_progress{
+				height: 30px;
+			}
+			
+			.button_progress .progress{
+				background-color: darkgoldenrod;
+			}
+			
+			
+			.a .progress_bar{
+				position: relative;
+			}
+
+			.a .percent{
+				background-color: #ffffff;
+				color: #000000;
+				padding: 0 10px;
+				position: absolute;
+				top: 0;
+				right: 10px;
+				display: block;
+			}
+
+		</style>
+	</head>
+
+	<body>
+
+		<!--
+        	描述：该插件使用时请一定设置a的宽度高度哟
+        -->
+		<div class="c1 progress_bar">
+      <div class="progress"></div>
+      <div class="percent_show">
+      	
+      </div>
+		</div>
+		
+		<div class="a">
+
+		</div>
+		<div class="b">
+
+		</div>
+		
+		<button class="button_A">4212312</button>
+		<button class="button_B">直升至100</button>
+		
+		<div class="button_progress progress_bar">
+      <div class="progress"></div>
+      <div class="percent_show"></div>
+		</div>
+		<script type="text/javascript" src="js/jquery.min.js" ></script>
+		<script>
+       //横向进度条
+      $.fn.progress = function(options) { //定义插件方法名
+        options = $.extend({
+          //定义一个对象，设置默认值
+
+          //百分比数量（默认为1）
+          percent: 99,
+
+          //速度（默认为1）
+          speed: 1,
+
+          //颜色（默认为黑）
+          color: 'black',
+
+          //滚动条是否自己运动（默认为false）
+          autoPlay: false,
+
+          //是否显示百分比（默认为false）
+          showPercent: false,
+
+          //回调函数（默认为null）
+          callBack: $.noop,
+
+        }, options);
+
+        //进度条百分比
+        var percent = options.percent;
+        
+        //进度条速度
+        var speed = options.speed;
+                
+        //进度条自动滚动
+        var autoPlay = options.autoPlay;
+        
+        //显示百分比
+        var showPercent = options.showPercent;
+        
+        //回调函数
+        var callBack = options.callBack;
+        
+        //进度条外部包裹层
+        var $_progeressBar = $(this);
+        
+        //总宽度
+        
+        var totalWidth = $_progeressBar.outerWidth();
+        
+        //进度条
+        var $_progress=$(this).find('.progress');
+        
+        //进度条百分比
+        var $_progressPercent=$(this).find('.percent_show');
+                      
+        //判断该元素是否自动移动
+        if(autoPlay == false) {
+          $_progress.css('width',progressWidth);
+        } else {
+        	//进度条现在的百分比
+          var nowPercent = 0;
+          var bar = setInterval(function() {
+            if(nowPercent < percent) {
+              nowPercent = nowPercent + speed;
+              $_progress.css("width", nowPercent/100*totalWidth);
+              //判断百分比是否显示
+			        if(showPercent == true) {
+			          $_progressPercent.html(nowPercent+'%');
+			        }
+            } else {
+              //进度条读满后，停止
+              clearInterval(bar);
+            }
+                        
+          }, 5);
+        };
+
+
+        //回调函数
+        if(callBack) {
+          callBack();
+        }
+
+        return this;
+      }
+		</script>
+		<script>
+			$(function() {
+				$(".c1").progress({
+					percent: 60,
+					autoPlay: true,
+					showPercent: true
+				});
+				
+				$('.button_A').click(function(){
+					$('.button_progress').progress({
+						autoPlay: true,
+						showPercent: true
+					});
+				});
+				
+				$('.button_B').click(function(){
+					$('.button_progress').progress({
+						
+					});
+				})
+				
+				
+			})
+		</script>
+	</body>
+
+</html>

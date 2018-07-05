@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>电梯导航优化</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			body.sort_open {
+				overflow: hidden;
+				padding-right: 17px;
+			}
+			/*主体内容*/
+			
+			.container {
+				margin: 400px auto;
+				width: 1000px;
+			}
+			
+			.container li {
+				height: 400px;
+			}
+			/*电梯内容*/
+			
+			.elevator_area {
+				position: fixed;
+				left: -50px;
+				top: 20%;
+				visibility: hidden;
+				opacity: 0;
+				z-index: 10;
+			}
+			
+			.elevator_area.show {
+				animation: show 0.5s ease-in-out;
+				left: 50px;
+				visibility: visible;
+				opacity: 1;
+			}
+			
+			@keyframes show {
+				from {
+					left: 0px;
+					visibility: hidden;
+					opacity: 0;
+				}
+				to {
+					left: 50px;
+					visibility: visible;
+					opacity: 1;
+				}
+			}
+			
+			.elevator_area.hide {
+				animation: hide 0.5s ease-in-out;
+				left: -50px;
+				visibility: hidden;
+				opacity: 0;
+			}
+			
+			@keyframes hide {
+				from {
+					left: 50px;
+					visibility: visible;
+					opacity: 1;
+				}
+				to {
+					left: -50px;
+					visibility: hidden;
+					opacity: 0;
+				}
+			}
+			
+			.elevator {
+				background: black;
+				color: #ffffff;
+				width: 60px;
+				height: auto;
+				position: relative;
+			}
+			
+			.elevator>a {
+				display: block;
+				line-height: 30px;
+				padding: 0 2px;
+				text-align: center;
+				cursor: pointer;
+			}
+			
+			.elevator>.elevator_nai.item {
+				display: block;
+				height: 30px;
+			}
+			
+			.elevator .elevator_nai.active {
+				background-color: red;
+			}
+			
+			.elevator .elevator_nai.select {
+				position: absolute;
+				width: 100%;
+			}
+			/*
+			 * 排序
+			 */
+			
+			.sort_area {
+				display: none;
+			}
+			
+			.sort_bg {
+				width: 100%;
+				height: 100%;
+				background: rgba(0, 0, 0, .5);
+				z-index: 9;
+				position: fixed;
+				left: 0;
+				top: 0;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			/*
+			 * 电梯导航插件
+			 */
+			;
+			(function($, window, document, undefined) {
+				//定义一个电梯对象
+				var Elevator = function(ele, opt) {
+					//对象本身
+					this.$element = ele,
+
+						//对象是否开启
+						this.isOpen = false,
+
+						//是否为点击触发
+						this.clickMove = false,
+						
+						//内容高度数组
+						this.contentHeightArray = [],
+
+						//排序功能是否触发
+						this.sortOpen = false,
+
+						//排序元素的高度数组
+						this.sortHeightArray = [],
+
+						//排序数组
+						this.sortArray = [],
+
+						//默认参数
+						this.defaults = {
+							//基础属性
+							basic: {
+								//电梯区域
+								'elevator': '',
+
+								//内容区域
+								'content': '',
+
+								//电梯导航出现的高度范围
+								'elevatorRegion': [0, 0],
+
+								//展示多少高度时出现下个楼层
+								'showHeight': 0,
+							},
+							//排序属性
+							sort: {
+								//是否允许排序
+								'permission': false,
+
+								//需要进行排序的元素
+								'sortContent': '',
+
+								//回调函数
+								'callBack': $.noop,
+							}
+
+						},
+
+						this.options = $.extend({}, this.defaults, opt);
+				}
+
+				//定义该对象的方法
+				Elevator.prototype = {
+
+					//定义一个存放高度的数组
+					heightArray: function() {
+						var that = this;
+						var showHeight = this.options.basic.showHeight;
+						$.each($(this.options.basic.content), function(key, val) {
+							that.contentHeightArray.push($(val).offset().top - showHeight);
+						});
+					},
+
+					//楼层出现函数
+					show: function() {
+						$(this.options.basic.elevator).removeClass('hide');
+						$(this.options.basic.elevator).addClass('show');
+						if(!this.clickMove) {
+							$(this.options.basic.elevator).find('.elevator_nai').eq(0).addClass('active');
+						}
+						this.isOpen = true;
+					},
+
+					//楼层消失函数
+					hide: function() {
+						$(this.options.basic.elevator).find('.elevator_nai').removeClass('active')
+						$(this.options.basic.elevator).removeClass('show');
+						$(this.options.basic.elevator).addClass('hide');
+						this.isOpen = false;
+					},
+
+					//比较函数
+					compare: function(height) {
+						//定义楼层所在的数字
+						var index;
+						for(var i = 0; i < this.contentHeightArray.length; i++) {
+							if(height >= this.contentHeightArray[i] && height < this.contentHeightArray[i + 1]) {
+								index = i;
+								break;
+							} else if(height >= this.contentHeightArray[this.contentHeightArray.length - 1]) {
+								index = this.contentHeightArray.length - 1;
+							}
+						}
+						return index;
+					},
+
+					//楼层点击函数
+					click: function(event) {
+						var that = this;
+						that.clickMove = true;
+						$(event.target).addClass('active').siblings().removeClass('active');
+						var index = $(event.target).index();
+						$('html,body').animate({
+							scrollTop: that.contentHeightArray[index]
+						}, 500, function() {
+							that.clickMove = false;
+						});
+					},
+
+					//排序功能开启函数
+					onSort: function() {
+						if(!this.sortOpen) {
+							var that = this;
+							$('.elevator .elevator_nai').removeClass('active');
+							//存放排序元素高度的数组
+							if(that.sortHeightArray.length == 0){
+								$.each($(this.options.sort.sortContent), function(key, val) {
+									that.sortHeightArray.push($(val).position().top);
+								})
+							}
+							$('body').addClass('sort_open');
+							$('body').append("<div class='sort_bg'></div>");
+							$(document).off('click', '.elevator .elevator_nai');
+							this.sortOpen = true;
+						}
+					},
+					
+					//排序功能关闭函数
+					offSort: function(){
+						if(this.sortOpen) {
+							var that = this;
+							$('body').removeClass('sort_open');
+							$('.sort_bg').remove();
+							//清空原数组
+							that.sortArray = [];
+							//提供新数组
+							$.each($(that.options.sort.sortContent),function(key,val){
+								that.sortArray.push($(val).attr('sortIndex'));
+							})
+							this.sortOpen = false;
+						}
+					},
+					
+					//楼层按钮被拖动比较函数
+					sortCompare: function(height) {
+						//定义排序数字
+						var num;
+						for(var i = 0; i < this.sortHeightArray.length; i++) {
+							if(height >= this.sortHeightArray[i] && height < this.sortHeightArray[i + 1]) {
+								num = i;
+								break;
+							} else if(height >= this.sortHeightArray[this.sortHeightArray.length - 1]) {
+								num = this.sortHeightArray.length - 1;
+								break;
+							} else if(height < this.sortHeightArray[0]) {
+								num = -1;
+								break;
+							}
+						}
+						return num;
+					}
+
+				}
+
+				//在插件中使用这个对象
+				$.fn.elevator = function(options) {
+
+					//创建Elevator的实体
+					var elevator = new Elevator(this, options);
+
+					//电梯导航出现的最小高度
+					var minHeight = elevator.options.basic.elevatorRegion[0];
+					//电梯导航消失的最大高度
+					var maxHeight = elevator.options.basic.elevatorRegion[1];
+
+					//定义一个存放高度的数组
+					elevator.heightArray();
+
+					//页面距离顶部的高度
+					var winPos;
+
+					//监听浏览器滚动事件 
+					$(window).scroll(function(event) {
+
+						winPos = $(window).scrollTop();
+
+						//开启导航条事件
+						if(winPos >= minHeight && winPos <= maxHeight && !elevator.isopen) {
+							elevator.show();
+						} else if((winPos < minHeight || winPos > maxHeight) && elevator.isOpen) {
+							elevator.hide();
+						}
+
+						//如果导航开启，且并未点击触发
+						if(elevator.isOpen && !elevator.clickMove) {
+							var index = elevator.compare(winPos);
+							$(elevator.options.basic.elevator).find('.elevator_nai').eq(index).addClass('active').siblings('.elevator_nai').removeClass('active');
+						}
+
+					});
+
+					//楼层被点击
+					$(document).on('click', '.elevator .elevator_nai', function() {
+						elevator.click(event);
+					});
+
+					//返回顶部被点击
+					$(document).on('click', '.elevator .backTop', function() {
+						$('html,body').animate({
+							scrollTop: 0
+						}, 500)
+					});
+
+					//允许排序
+					if(elevator.options.sort.permission) {
+
+						//排序按钮被点击
+						$(document).on('click', '.elevator .sort', function() {
+							elevator.onSort();
+						});
+						
+						var old_index;
+
+						//楼层按钮按下
+						$(document).on('mousedown', '.sort_open ' + elevator.options.sort.sortContent, function(event) {
+							event.preventDefault && event.preventDefault();
+							//y坐标
+							var offset_y = $(event.target).position().top;
+							//获取当前鼠标的坐标
+							var mouse_y = event.pageY;
+
+							//加入特殊class和div
+							$(event.target).addClass('active select');
+							$(event.target).css('top', offset_y);
+							var item_$ = $("<div class='elevator_nai item'></div>");
+							$(event.target).after(item_$);
+
+							//确定排序元素的位数
+							old_index = $(event.target).index();
+							var index = $(event.target).index();
+
+							$('.elevator').bind('mousemove', function(ev) {
+								//计算鼠标的移动距离
+								var _y = ev.pageY - mouse_y;
+
+								//移动后的top
+								var now_top = offset_y + _y;
+								var num = elevator.sortCompare(now_top);
+
+								//转移填充元素
+								if(num != index) {
+									item_$.remove();
+									if(num == -1) {
+										$(elevator.options.sort.sortContent).eq(0).before(item_$);
+									} else {
+										$(elevator.options.sort.sortContent).eq(num).after(item_$);
+									}
+									index = num;
+								}
+								//设置移动后的元素坐标
+								var now_y = now_top + "px";
+								$(event.target).css('top', now_y);
+							})
+						});
+
+						//楼层按钮松开
+						$(document).on('mouseup', '.sort_open ' + elevator.options.sort.sortContent, function(event) {
+							$(event.target).removeClass('select active');
+							$(event.target).attr('style', '');
+							$('.elevator_nai.item').replaceWith($(event.target));
+							$('.elevator').unbind("mousemove");
+							
+							var new_index = $(event.target).index();
+							var old = $(elevator.options.basic.content).eq(old_index);
+							old.remove()
+							$(elevator.options.basic.content).eq(new_index-1).after(old); 
+							
+						});
+						
+						//关闭排序事件
+						$(document).on('click', '.sort_open .sort_bg', function() {
+							elevator.offSort();
+						  //楼层被点击
+							$(document).on('click', '.elevator .elevator_nai', function() {
+								elevator.click(event);
+							});
+						});
+
+					}
+				}
+
+			})(jQuery, window, document);
+		</script>
+		<script>
+			$(function() {
+				$('.elevator_nav').elevator({
+					//基础属性
+					basic: {
+						elevator: '.elevator_area', //电梯区域
+						content: '.container ul li', //内容区域
+						elevatorRegion: [400, 1600], //电梯导航出现的高度范围
+						showHeight: 50 //展示多少高度时出现下个楼层
+					},
+					//排序属性
+					sort: {
+						permission: true, //是否允许排序
+						sortContent: '.elevator .elevator_nai', //需要进行排序的元素
+						callBack: function() {
+
+						} //回调函数
+					}
+				})
+			})
+		</script>
+	</head>
+
+	<body>
+		<!--整个电梯导航区域-->
+		<div class="elevator_nav">
+			<!--电梯区域-->
+			<div class="elevator_area">
+				<div class="sort_area">
+					开始排序
+				</div>
+				<div class="elevator">
+					<a class="elevator_nai" sortIndex="0">第一个</a>
+					<a class="elevator_nai" sortIndex="1">第二个</a>
+					<a class="elevator_nai" sortIndex="2">第三个</a>
+					<a class="elevator_nai" sortIndex="3">第四个</a>
+					<a class="sort">排序</a>
+					<a class="backTop">返回顶部</a>
+				</div>
+			</div>
+
+			<!--内容区域-->
+			<div class="container">
+				<ul>
+					<li>111</li>
+					<li>222</li>
+					<li>333</li>
+					<li>444</li>
+				</ul>
+			</div>
+		</div>
+	</body>
+
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>模态框</title>
+		<style>
+			
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			
+			.modle_open{
+				overflow: hidden;
+				padding-right: 17px;
+			}
+			
+			.modle {
+				display: none;
+				position: fixed;
+				z-index: 5;
+				width: 100%;
+				height: 100%;
+				top: 0;
+				left: 0;
+			}
+			
+			.modle_bg {
+				width: 100%;
+				height: 100%;
+				background-color: #000;
+				opacity: 0.3;
+				-webkit-opacity: 0.3;
+				-khtml-opacity: 0.3;
+				-moz-opacity: 0.3;
+				filter: Alpha(opacity=30);
+				z-index: 5;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+			
+			.modle_content {
+				padding: 20px;
+				background-color: #FFFFFF;
+				z-index: 8;
+				position: absolute;
+				left: 50%;
+				height: 500px;
+			}
+			
+			.modle.way2 .modle_content {
+				margin-top: 30px;
+				-webkit-transition: -webkit-transform .3s ease-out;
+				-o-transition: -o-transform .3s ease-out;
+				transition: transform .3s ease-out;
+				-webkit-transform: translate(0, -25%);
+				-ms-transform: translate(0, -25%);
+				-o-transform: translate(0, -25%);
+				transform: translate(0, -25%);
+			}
+			
+			.way2.in .modle_content {
+		    -webkit-transform: translate(0,0);
+		    -ms-transform: translate(0,0);
+		    -o-transform: translate(0,0);
+		    transform: translate(0,0); 
+			}
+			/*关闭按钮（可以自己调整样式哦）*/
+			
+			.modle_close {
+				display: block;
+				width: 50px;
+				height: 50px;
+				background-color: red;
+				cursor: pointer;
+			}
+		</style>
+	</head>
+
+	<body>
+-
+		<!--
+			作者：offline
+			时间：2017-11-24
+			描述：模态框
+		-->
+		<button class="modle_button">
+			点击即可出现模态框
+		</button>
+
+		<div class="modle modle_1 way2">
+			<div class="modle_bg">
+
+			</div>
+
+			<div class="modle_content">
+				<a class="modle_close">
+
+				</a>
+				<button class="modle_button2">
+					点击关闭模态框
+				</button>
+			</div>
+		</div>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script>
+			(function($) {
+				//电梯导航
+				$.fn.modle = function(options) {
+					options = $.extend({
+						//是否自动出现
+						show: true,
+
+						//点击背景是否隐藏
+						backdrop: false,
+
+						//隐藏功能
+						hide: false,
+
+						//展示的方式
+						modleWay: 1,
+
+						//返回顶部按钮
+						backTop: false,
+
+					}, options);
+
+					//隐藏模态框的功能
+					var hide = options.hide;
+
+					//模态框本身
+					var $_modle = $(this);
+
+					//是否自动出现
+					var show = options.show;
+
+					//点击背景是否隐藏
+					var backdrop = options.backdrop;
+
+					//展示的方式
+					var modleWay = options.modleWay;
+
+					//定义一个关闭函数
+					var closeModle = function() {
+						//模态款弹出方式
+						if(modleWay == 1){
+							$_modle.hide();
+							$('body').removeClass('modle_open');
+						}else{
+							$_modle.removeClass('in');
+							  setTimeout(function(){
+							  	$_modle.hide();
+									//删除body样式
+									$('body').removeClass('modle_open');
+							},300);
+						}
+					}
+
+					if(hide) {
+						show = false;
+						closeModle();
+					}
+
+					//打开模态框
+					if(show) {
+						$('body').addClass('modle_open');
+						$_modle.show();
+						//模态框里的内容
+						var $_modleContent = $_modle.find('.modle_content');
+						//模态框里的内容的宽高
+						var modle_content_width = $_modleContent.outerWidth();
+						var modle_content_height = $_modleContent.outerHeight();
+
+						//模态款弹出方式
+						if(modleWay == 1){
+							$_modleContent.css({
+								"margin-left": -modle_content_width / 2 + 'px',
+								"margin-top": -modle_content_height / 2 + 'px',
+								'top': '50%'
+							});
+						}else{
+							$_modleContent.css({
+									"margin-left": -modle_content_width / 2 + 'px',
+								});
+							$_modle.addClass('in');
+						}
+					}
+					//模态框关闭按钮
+					var $_close = $_modle.find('.modle_close');
+
+					//关闭按钮（模态框消失方式）
+					$_close.click(function() {
+						closeModle();
+					});
+
+					//模态框背景
+					var $_modleBg = $_modle.find('.modle_bg');
+
+					//点击背景模态框消失
+					if(backdrop) {
+						$_modleBg.click(function() {
+							closeModle();
+						})
+					}
+
+					return this;
+				}
+
+			})(window.jQuery);
+		</script>
+		<script>
+			$('.modle_button').click(function() {
+				$('.modle_1').modle({
+					modleWay: 2, //展现方式
+					backdrop: true //点击背景模态框消失
+				});
+
+			})
+
+			$('.modle_button2').click(function() {
+				$('.modle_1').modle({
+					modleWay: 2, //离开方式
+					hide: true //点击模态框消失
+				});
+
+			})
+		</script>
+	</body>
+
+</html>

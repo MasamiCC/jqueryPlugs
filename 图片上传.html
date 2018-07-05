@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>图片上传插件</title>
+
+		<style>
+			.choose_file {
+				width: 200px;
+				height: 100px;
+				text-align: center;
+				background-color: blue;
+				color: #ffffff;
+				line-height: 100px;
+				overflow: hidden;
+				cursor: pointer;
+			}
+			
+			.file_input {
+				display: none;
+			}
+		</style>
+	</head>
+
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script>
+		(function($) {
+			$.fn.file = function(options) { //定义插件方法名
+				options = $.extend({
+					//定义一个对象，设置默认值
+					
+					//点击按钮展示位置
+					chooseFilePosition: $.noop,
+					
+					//input摆放区域
+					inputPosition: $.noop,
+
+					//文件名摆放位置（默认为null）
+					namePosition: $.noop,
+
+					//图片展示位置（默认为null）
+					imgPosition: $.noop,
+
+					//文件类型（默认为null）
+					type: $.noop,
+
+					//如果是图片，是否展示图片
+					showImg: false,
+
+					//是否允许多文件上传（默认为false）
+					batchUpload: false,
+
+					callBack: $.noop,
+
+				}, options);
+
+				//获取元素
+				var $_self = $(this);
+								
+				//选择文件的区域
+				$_choose_file = $(options.chooseFilePosition);
+
+				//放置input的区域
+				$_set_input = $(options.inputPosition);
+
+				//放置文件名的区域
+				$_set_input_name = $(options.namePosition);
+
+				//放置图片的区域
+				$_set_img_area = $(options.imgPosition);
+				
+				
+				//设置位置，文件类型，如果是图片是否显示图片,是否允许多文件上传
+				var batchUpload = options.batchUpload;
+				var type = options.type;
+				var showImg = options.showImg;
+				var callBack = options.callBack;
+				//生成一个文件选择器
+				var $_file;
+
+				//是否是第一次点击
+				var firstClick = true;
+
+				var num = 0;
+
+				//文件选择被点击
+				$(document).on('click', '.choose_file', function() {
+					if(batchUpload) {
+						//进行遍历判断是否每个input都有值
+						$.each($_set_input.find('input'),function(key,val){
+							if($(val).val()==''){
+								$(val).remove();
+								num--;
+							}
+						});
+						//生成一个input
+						$_file = $("<input type='file' class='file_input' fileNum='" + num + "' />");
+						$_set_input.append($_file);
+						num++;
+						return $_file.click();
+					} else {
+						if(firstClick) {
+							$_file = $("<input type='file' class='file_input'>");
+							$_set_input.append($_file);
+							firstClick = false;
+							return $_file.click();
+						} else {
+							return $_file.click();
+						}
+					}
+				});
+				
+				//定义一个判断文件类型的正则
+
+				//文件被选择的触发事件
+				$(document).on('change', '.file_input', function() {
+          
+          //得到文件名
+					var name = this.files[0].name;
+					//得到文件类型
+					var file_type=(name.substr(name.lastIndexOf("."))).toLowerCase();
+					
+					var $_input_name; 
+					
+					if(showImg) {
+						var objUrl = getObjectURL(this.files[0]);
+						var $_img = $("<img src='" + objUrl + "'fileNum='"+num+"' />");
+					}
+
+					if(batchUpload) {
+						$_input_name = $("<div class='name_show' fileNum='" + (num - 1) + "'>" + name + "</div>");
+						$_set_input_name.append($_input_name);
+						$_set_img_area.append($_img);
+					} else {
+						$_input_name = $("<div class='name_show'>" + name + "</div>");
+						$_set_input_name.html($_input_name);
+						$_set_img_area.html($_img);
+					}
+
+				})
+
+				//获取图片路径方法
+				var getObjectURL = function(file) {
+					var url = null;
+					if(window.createObjectURL != undefined) { // basic
+						url = window.createObjectURL(file);
+					} else if(window.URL != undefined) { // mozilla(firefox)
+						url = window.URL.createObjectURL(file);
+					} else if(window.webkitURL != undefined) { // webkit or chrome
+						url = window.webkitURL.createObjectURL(file);
+					}
+					return url;
+				}
+				
+				//定义一个判断文件类型的方法
+				var confirmType = function() {
+					
+				}
+				return this;
+			}
+		})(window.jQuery);
+	</script>
+
+	<script>
+		$(function() {
+			$('.a').file({
+				chooseFilePosition:'.choose_file',//点击按钮
+				inputPosition:'.input_set',//input摆放
+				namePosition: '.input_name',//文件名放置区域
+				imgPosition: '.img_area', //如果是图片，图片放置区域 
+				batchUpload: true, //是否支持多文件上传
+				type: ['img','word'], // 上传类型
+				showImg: true, //是否显示图片
+				size: '100kb',
+				callBack: function() {
+
+				}
+			});
+
+		})
+	</script>
+
+	<body>
+
+		<!--文件提交 -->
+		<div class="a">
+
+			<!--文件选择区域 -->
+			<div class="choose_file">
+				选择文件
+			</div>
+
+			<!--放置input区域 -->
+			<div class="input_set">
+
+			</div>
+
+			<!--放置文件名区域 -->
+			<div class="input_name">
+
+			</div>
+
+			<!--如果需要，放置图片区域-->
+			<div class="img_area">
+
+			</div>
+
+		</div>
+	</body>
+
+</html>
