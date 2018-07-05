@@ -1,34 +1,19 @@
-# 各式各样的jquert插件
-    这是一个基于vue-cli的全家桶示例项目，使用了vue-cli作为脚手架搭建，使用了mint-ui作为前端框架。
-    路由管理:vue-router，状态管理:vuex，网络请求:axios。
-    这是一个移动端的app项目示例，可根据此例进行一个H5应用的搭建，利用打包工具（如cordova）可以打包成原生应用。
-    项目的默认端口是`8899`，你也可以在webpack的配置中自己更改。
+# 各式各样的jquery插件
+    别和我提什么react，vue，angular。老子写代码只用jquery
 
-> A juqery project
+> 一个jquery插件组合包
 
-## Build Setup
+## 打开方式
 
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
+``` bash 
+  当然是你想怎么打开就怎么打开咯
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+## 打开方式
+
+``` bash 
+  当然是你想怎么改就怎么改咯，前提是别报错哦
+```
+
+为了更好的学习，建议你上的两个网站 [w3cschool](http://www.w3school.com.cn/) 和 [阮一峰大神](http://www.ruanyifeng.com/blog/)。
+
