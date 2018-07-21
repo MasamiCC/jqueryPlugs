@@ -1,0 +1,240 @@
+
+* {
+    box-sizing: border-box;
+}
+@themeC:#009687;
+@bgCInit:#393d49;
+@bgC:#4f5563;
+@borderC:#767d8f;
+ul,
+dl,
+dd,
+dt,
+li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+em,i{
+    font-style: normal;
+}
+
+#cityBox {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+    font-family: 'microsoft yahei';
+    position: relative;
+    &.active{
+        .cityText{
+            border-bottom: 0;
+            background-color: @bgCInit;
+            &.active{
+                .cityBtn{
+                    display: block;
+                }
+            }
+            .content{
+                span{
+                    width: 70px;
+                    text-align: left;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    float: left;
+                    font-size: 12px;
+                    height: 24px;
+                    line-height: 24px;
+                    background-color: @bgC;
+                    margin-right: 6px;
+                    border-radius: 5px;
+                    &.active{
+                        display: block;
+                    }
+                }
+                i{
+                    display: block;
+                }
+            }
+        }
+        .cityPanel{
+            display: block;
+        }
+    }
+    .cityText {
+        width: 292px;
+        height: 38px;
+        line-height: 36px;
+        font-size: 14px;
+        text-align: center;
+        border-radius: 3px;
+        border: 1px solid @borderC;
+        padding-right: 10px;
+        background-color: @bgC;
+        position: relative;
+        cursor: pointer;
+        &.active{
+            .defaultTxt{
+                display: none;
+            }
+        }
+        .content {
+            width: 100%;
+            height: 100%;
+            line-height: 24px;
+            color: #fefffd;
+            padding: 6px;
+            span{
+                display: none;
+                padding: 0 6px;
+                position: relative;
+                &.active{
+                    display: inline-block;
+                }
+            }
+            i{
+                display: none;
+                width: 15px;
+                height: 15px;
+                line-height: 13px;
+                text-align: center;
+                font-size: 12px;
+                border-radius: 50%;
+                background-color: @bgCInit;
+                border: 1px solid @bgCInit;
+                position: absolute;
+                top: 50%;
+                right: 5px;
+                transform: translateY(-50%);
+                -ms-transform: translateY(-50%);
+                &:hover{
+                    border: 1px solid @borderC;
+                }
+            }
+        }
+        .icon-jiantou {
+            color: @themeC;
+            position: absolute;
+            right: 10px;
+            top: 0;
+            &.active{
+                display: block;
+            }
+        }
+        .cityBtn{
+            display: none;
+            width: 44px;
+            height: 22px;
+            line-height: 22px;
+            font-size: 12px;
+            background-color: @themeC;
+            border-radius: 3px;
+            cursor: pointer;
+            border: 0;
+            color: #fff;
+            position: absolute;
+            right: 10px;
+            top: 7px;
+        }
+    }
+
+    .cityPanel {
+        display: none;
+        width: 292px;
+        height: 387px;
+        color: #fff;
+        font-size: 14px;
+        background-color: @bgC;
+        border: 1px solid @borderC;
+        border-top: 0;
+        position: absolute;
+        .cityTop {
+            height: 41px;
+            border-bottom: 1px solid @borderC;
+            ul {
+                height: 40px;
+                line-height: 39px;
+                float: left;
+                margin-left: -1px;
+                li {
+                    width: 70px;
+                    text-align: center;
+                    float: left;
+                    border-top: 1px solid @bgC;
+                    cursor: pointer;
+                    &.active {
+                        height: 41px;
+                        background-color: @bgC;
+                        border: 1px solid @borderC;
+                        border-bottom: 0;
+                    }
+                }
+            }
+        }
+        .defaultBtn {
+            width: 50px;
+            height: 24px;
+            background-color: @themeC;
+            text-align: center;
+            float: right;
+            line-height: 24px;
+            border-radius: 3px;
+            margin-right: 20px;
+            margin-top: 9px;
+            cursor: pointer;
+        }
+    }
+
+    .citysContent {
+        padding-top: 13px;
+        .selBox {
+            display: none;
+            font-size: 12px;
+            &.active {
+                display: block;
+            }
+        }
+        .noData {
+            display: none;
+            padding-left: 10px;
+            color: #ccc;
+            &.active {
+                display: block;
+            }
+        }
+        .citysBox,
+        .countyBox {
+            padding: 0 20px;
+        }
+        .sep {
+            height: 8px;
+        }
+        dl {
+            width: 100%;
+            height: 26px;
+        }
+        dd {
+            height: 26px;
+            line-height: 26px;
+            float: left;
+            padding: 0 10px;
+            cursor: pointer;
+            &:last-of-type {
+                padding-right: 0;
+            }
+            &:hover,
+            &.active {
+                color: #00baa9;
+            }
+        }
+        dt {
+            width: 42px;
+            height: 26px;
+            line-height: 26px;
+            float: left;
+            text-align: center;
+        }
+    }
+}
