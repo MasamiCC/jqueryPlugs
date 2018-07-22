@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>简单的tab插件</title>
+		<style>
+			.active {
+				background: red;
+			}
+		</style>
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="city_picker/js/city.data-3.js"></script>
+		<script>
+			//jquery新增方法
+			;
+			(function($, window, document, undefined) {
+
+				//定义一个构造函数
+				var LinkAge = function(ele, opt) {
+					  this.$element = ele,
+					  //定义一个一个一级数据
+					  this.data1 = cityData3,
+					  //定义一个二级数据
+					  this.useData = [],
+					  //省市区子元素
+					  this.areas = this.$element.find('.area_childen');
+						//默认数值
+						this.defaults = {
+							//回调函数
+							'callBack': $.noop()
+						},
+						this.options = $.extend({}, this.defaults, opt)
+				}
+
+				LinkAge.prototype = {
+
+					//定义一个加载数据的方法
+					pushData: function(data,obj) {
+						//定义一个集合
+						var dataGroup = '';
+						$.each(data,function(key,value){
+							dataGroup += '<dd dataId="'+value.value+'">'+value.text+'</dd>' 
+						})
+						obj.html(dataGroup);
+					},
+
+					//更改被选中的数据
+					changeData: function(dataId,index){
+						var that = this;
+						//所在区域为省份
+						if(index === '0'){
+							//遍历得到数据
+							$.each(that.data1,function(key,value){
+								if(value.value === dataId){
+									that.useData = value.children;
+									return false;
+								}
+							})
+						}
+					},
+
+					//清空数据
+					emptyData: function(num){
+						//清空子区域的内容
+						this.areas.eq(num).empty();
+						//清空被选择的数据
+						this.useData = [];
+					},
+
+					//各区对象被点击
+					objClick: function(self){
+						//更改选中状态
+						self.addClass('active').siblings().removeClass('active');
+						//修改所需的数据
+						//得到dataId
+						var dataId = self.attr('dataId');
+						//得到父元素区域
+						var index = self.parent().attr('data-index');
+						//需要操作区域的编号
+						var opNum = parseInt(index) + 1;
+						//先清空数据
+						this.emptyData(opNum);
+						//调用更改数据的方法
+						this.changeData(dataId,index);
+						//调用加载数据的方法
+						this.pushData(this.useData,this.areas.eq(opNum));
+
+					}
+				}
+
+				//在插件中使用这个对象
+				$.fn.linkAge = function(options) {
+					//创建Beautifier的实体
+					var linkAge = new LinkAge(this, options);
+					//定义省份对象
+					var province = $(this).find('.province'); 
+					//获取所有的省份
+					linkAge.pushData(linkAge.data1,province);
+
+					//省对象被点击
+					$(document).on('click','.province dd',function(){
+						//是否重复点击或初始化
+						var flag = $(this).hasClass('active');
+						if(!flag){
+							linkAge.objClick($(this));
+						}
+					})
+
+
+				}
+			})(jQuery, window, document);
+		</script>
+		<script>
+			$(function() {
+				$('.area').linkAge({
+					callBack: function(self) {
+						alert(111);
+					} //切换完成后的回调函数
+				});
+			})
+		</script>
+	</head>
+
+	<body>
+		<div class="area">
+			<!-- 省 -->
+			<div class="province area_childen" data-index='0'></div>
+			<!-- 市 -->
+			<div class="city area_childen" data-index='1'></div>
+			<!-- 区 -->
+			<div class="region area_childen" data-index='2'></div>
+		</div>
+
+	</body>
+
+</html>
