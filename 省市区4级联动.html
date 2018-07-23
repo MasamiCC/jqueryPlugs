@@ -8,9 +8,10 @@
 			.active {
 				background: red;
 			}
-			.area > div {
+			
+			.area>div {
 				float: left;
-				width: 33%;
+				width: 25%;
 			}
 		</style>
 		<script type="text/javascript" src="js/jquery.min.js"></script>
@@ -22,17 +23,20 @@
 
 				//定义一个构造函数
 				var LinkAge = function(ele, opt) {
-					  this.$element = ele,
-					  //定义一个需要遍历的数据
-					  this.useCityData = cityData3,
+					this.$element = ele,
+						//定义一个需要遍历的数据
+						this.useCityData = cityData3,
 
-					  this.useReginData = cityData3,
-					  //定义存放子元素展示的数据
-					  this.showData = cityData3,
-					  //省市区子元素
-					  this.areas = this.$element.find('.area_childen');
-						//默认数值
-						this.defaults = {
+						this.useReginData = cityData3,
+						//定义存放子元素展示的数据
+						this.showData = cityData3,
+
+						//函数对象的className
+						this.className = this.$element.selector,
+						//省市区子元素
+						this.areas = this.$element.find('.area_childen');
+					//默认数值
+					this.defaults = {
 							//回调函数
 							'callBack': $.noop()
 						},
@@ -42,21 +46,21 @@
 				LinkAge.prototype = {
 
 					//定义一个加载数据的方法
-					pushData: function(data,obj) {
+					pushData: function(data, obj) {
 						//定义一个集合
 						var dataGroup = '';
-						$.each(this.showData,function(key,value){
-							dataGroup += '<dd dataId="'+value.value+'">'+value.text+'</dd>' 
+						$.each(this.showData, function(key, value) {
+							dataGroup += '<dd dataId="' + value.value + '">' + value.text + '</dd>'
 						})
 						obj.html(dataGroup);
 					},
 
 					//更改城市选中的数据
-					changeCityData: function(dataId,index){
+					changeCityData: function(dataId) {
 						var that = this;
 						//遍历得到数据
-						$.each(that.useCityData,function(key,value){
-							if(value.value === dataId){
+						$.each(that.useCityData, function(key, value) {
+							if(value.value === dataId) {
 								that.showData = value.children;
 								that.useReginData = value.children;
 								return false;
@@ -65,19 +69,37 @@
 					},
 
 					//改变地区选中的数据
-					changeRegionData: function(dataId,index){
+					changeRegionData: function(dataId) {
 						var that = this;
 						//遍历得到数据
-						$.each(that.useReginData,function(key,value){
-							if(value.value === dataId){
+						$.each(that.useReginData, function(key, value) {
+							if(value.value === dataId) {
 								that.showData = value.children;
 								return false;
 							}
 						})
 					},
 
+					//更改地区
+					//封装一个定义ajax promise的方法
+					changeCountyData: function(dataId) {
+						return new Promise((resovle, reject) => {
+							$.ajax({
+								"type": "get",
+								url: 'http://passer-by.com/data_location/town/' + dataId + '.json',
+								dataType: 'json',
+								"success": res => {
+									resovle(res);
+								},
+								"error": err => {
+									reject(err);
+								}
+							})
+						})
+					},
+
 					//清空数据
-					emptyData: function(num){
+					emptyData: function(num) {
 						//清空子区域的内容
 						this.areas.eq(num).nextAll().empty();
 						//清空展示的数据
@@ -86,7 +108,8 @@
 					},
 
 					//各区对象被点击
-					objClick: function(self){
+					objClick: function(self) {
+						var that = this;
 						//更改选中状态
 						self.addClass('active').siblings().removeClass('active');
 						//修改所需的数据
@@ -100,13 +123,33 @@
 						this.emptyData(opNum);
 						//调用更改数据的方法
 						//判断改变的是哪个区域的数据
-						if(opNum === 0){
-							this.changeCityData(dataId,index);
-						}else if(opNum === 1){
-							this.changeRegionData(dataId,index);
+						if(opNum === 0) {
+							this.changeCityData(dataId);
+							//调用加载数据的方法
+							this.pushData(this.showData, this.areas.eq(opNum + 1));
+						} else if(opNum === 1) {
+							this.changeRegionData(dataId);
+							//调用加载数据的方法
+							this.pushData(this.showData, this.areas.eq(opNum + 1));
+						} else if(opNum === 2) {
+							if(dataId % 1e4 && dataId < 7e6) { //是否为“区”且不是港澳台地区
+								this.changeCountyData(dataId).then(res => {
+									var i = 0
+									$.each(res, function(key, val) {
+										var data = {
+											value: key,
+											text: val
+										};
+										that.showData[i] = data;
+										i++;
+									})
+									//调用加载数据的方法
+									that.pushData(that.showData, that.areas.eq(opNum + 1));
+								}).catch(err => {
+
+								});
+							}
 						}
-						//调用加载数据的方法
-						this.pushData(this.showData,this.areas.eq(opNum+1));
 
 					}
 				}
@@ -116,28 +159,18 @@
 					//创建Beautifier的实体
 					var linkAge = new LinkAge(this, options);
 					//定义省份对象
-					var province = $(this).find('.province'); 
+					var province = $(this).find('.province');
 					//获取所有的省份
-					linkAge.pushData(linkAge.data1,province);
+					linkAge.pushData(linkAge.data1, province);
 
-					//省对象被点击
-					$(document).on('click','.province dd',function(){
+					//省市区对象被点击
+					$(document).on('click', linkAge.className + ' dd', function() {
 						//是否重复点击或初始化
 						var flag = $(this).hasClass('active');
-						if(!flag){
+						if(!flag) {
 							linkAge.objClick($(this));
 						}
 					})
-
-					//市对象被点击
-					$(document).on('click','.city dd',function(){
-						//是否重复点击或初始化
-						var flag = $(this).hasClass('active');
-						if(!flag){
-							linkAge.objClick($(this));
-						}
-					})
-
 
 				}
 			})(jQuery, window, document);
@@ -161,6 +194,8 @@
 			<div class="city area_childen" data-index='1'></div>
 			<!-- 区 -->
 			<div class="region area_childen" data-index='2'></div>
+			<!--县-->
+			<div class="county area_childen" data-index='3'></div>
 		</div>
 
 	</body>
