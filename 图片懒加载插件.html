@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>图片懒加载</title>
+		<style>
+			*{
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			html{
+				height: 100%;
+			}
+			body{
+				height: 100%;
+			}
+			div{
+				height: 100%;
+			}
+			img {
+				width: 500px;
+				height: 600px;
+				display: block;
+				margin-bottom: 400px;
+			}
+		</style>
+	</head>
+	<body>
+		<div>
+			<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-original='img/1.jpg'/>
+			<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-original='img/2.jpg'/>
+			<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-original='img/3.jpg'/>
+			<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC" data-original='img/4.jpg'/>
+		</div>
+		
+		<script src="js/jquery.min.js"></script>
+		<script>
+			//jquery新增方法
+			;
+			(function($, window, document, undefined) {
+
+				//定义一个构造函数
+				var LazyLoad = function(ele, opt) {
+					  this.imgList = [],//所有需要懒加载的对象
+
+					  this.$window = $(window), //获取window的绑定
+
+					  this.winPos = 0, //距离顶部的高度
+
+						//默认数值
+						this.defaults = {
+							//距离可视区域多少高度是开始加载（默认为0）
+						  'threshold': 0,
+
+							//对某一容器内的图片进行懒加载（默认为body）
+							'container': 'body',
+
+							//回调函数
+							'callBack': $.noop()
+						},
+						this.options = $.extend({}, this.defaults, opt)
+				}
+
+				LazyLoad.prototype = {
+
+					//定义一个判断页面滑动的函数
+					onScroll: function(self){
+						//获取页面滚动的高度
+						self.winPos = self.$window.scrollTop();
+						//定义一个得删除的索引数组
+						var loadedIndex = [];
+						if(self.imgList.length > 0){
+							//遍历图片数组
+							$.each(self.imgList,function(key,val){
+								//判断图片是否在可视区域内
+								if($(val).offset().top - self.options.threshold <= self.winPos){
+									//改变所选图片的src
+									$(val).attr('src',$(val).attr('data-original'))
+									//添加到待删除数组中
+									loadedIndex.unshift(key);
+								}
+							});
+
+							//删除已处理的对象
+							$.each(loadedIndex,function(key){
+								self.imgList.splice(key,1);
+							})
+						}
+					}
+					
+				}
+
+				//在插件中使用这个对象
+				$.fn.lazyLoad = function(options) {
+					//创建lazyLoad的实体
+					var lazyLoad = new LazyLoad(this, options);
+
+					//获取所有对象，并把对象存入数组
+					lazyLoad.imgList = this;
+
+					//绑定页面滑动事件
+					$(window).scroll(function(event){
+						lazyLoad.onScroll(lazyLoad)
+					})
+					// lazyLoad.$window.scroll(lazyLoad.onScroll(lazyLoad))
+					// // 手动触发一次:
+					lazyLoad.onScroll(lazyLoad);
+
+				}
+			})(jQuery, window, document);
+		</script>
+		<script>
+			$(function(){
+				$('img').lazyLoad({
+					threshold: 500, //距离可视区域多少高度是开始加载
+					container: 'div',//对某一容器内的图片进行懒加载
+				})
+			})
+		</script>
+	</body>
+</html>
