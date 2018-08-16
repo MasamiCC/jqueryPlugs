@@ -79,6 +79,9 @@
 									$(val).attr('src',$(val).attr('data-original'))
 									//添加到待删除数组中
 									loadedIndex.unshift(key);
+								}else{
+									//当出现第一个未在显示区域内的图片时，跳出循环
+									return false;
 								}
 							});
 

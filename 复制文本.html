@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title>复制文本</title>
+	</head>
+
+	<body>
+		<script type="text/javascript">
+		function copyUrl2()
+		    {
+		        var Url2=document.getElementById("biao1").innerText;
+		        var oInput = document.createElement('input');
+		        oInput.value = Url2;
+		        document.body.appendChild(oInput);
+		        oInput.select(); // 选择对象
+		        document.execCommand("Copy"); // 执行浏览器复制命令
+		        oInput.className = 'oInput';
+		        oInput.style.display='none';
+		        alert('复制成功');
+		    }
+		</script>
+		<div cols="20" id="biao1">12345678</div>
+		<input type="button" onClick="copyUrl2()" value="点击复制代码" />
+
+	</body>
+
+</html>
